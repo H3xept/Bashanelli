@@ -3,8 +3,12 @@ CFLAGS = -Wall --pedantic --std=c99
 SOURCE_FOLDER = src
 OUT_FOLDER = bin
 DEPENDENCIES_FOLDER = dependencies
+PYTHON_DEPENDENCIES_FOLDER = $(DEPENDENCIES_FOLDER)/python
 SOURCE_FILES = $(SOURCE_FOLDER)/*.c
 OUT_NAME = bashanelli
+
+COLOR_TEXT = colorText
+COLOR_TEXT_LOCATION = "https://github.com/rory660/colorText"
 
 ANSI_IS_A_CURSE = ANSIsACurse
 ANSI_IS_A_CURSE_LOCATION = ../$(ANSI_IS_A_CURSE)
@@ -27,6 +31,14 @@ prepare_dependencies:
 	@ if [ ! -d $(DEPENDENCIES_FOLDER)/$(READLINE) ]; then \
 		make dep_READLINE; \
 	fi;
+	@ if [ ! -d $(PYTHON_DEPENDENCIES_FOLDER)/$(COLOR_TEXT) ]; then \
+		make dep_COLOR_TEXT; \
+	fi;
+
+dep_COLOR_TEXT:
+	@ mkdir -p $(PYTHON_DEPENDENCIES_FOLDER)/$(COLOR_TEXT)
+	@ git clone $(COLOR_TEXT_LOCATION)
+	@ mv $(COLOR_TEXT) $(PYTHON_DEPENDENCIES_FOLDER)/$(COLOR_TEXT)
 
 dep_ANSI:
 	@ mkdir -p $(DEPENDENCIES_FOLDER)/$(ANSI_IS_A_CURSE)
@@ -69,10 +81,11 @@ taget_dir:
 	@ mkdir -p $(OUT_FOLDER)
 	@ mkdir -p $(DEPENDENCIES_FOLDER)
 	@ mkdir -p $(DEPENDENCIES_FOLDER)/libs
+	@ mkdir -p $(PYTHON_DEPENDENCIES_FOLDER)
 
 test:
 	@ echo "\033[1mInit testing for $(OUT_NAME)...\033[0m"
-	@ sh test.sh
+	@ python3 runTests.py tests/*Test.h
 	@ echo "\033[32m\033[1mTesting complete!\033[0m"
 	
 clean:

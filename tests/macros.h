@@ -21,7 +21,7 @@
 
 #define _test_passed() \
 	c_color(C_COLOR_CODE_Green);\
-	printf(" ✓\n", NULL);\
+	printf(" ✓\n");\
 	c_reset();
 
 #define run_test(test_func) \
