@@ -18,6 +18,10 @@ READLINE = BareBonesReadline
 READLINE_LOCATION = ../$(READLINE)
 READLINE_LOCATION_GIT = "https://github.com/H3xept/BareBonesReadline"
 
+HISTORY = BareBonesHistory
+HISTORY_LOCATION = ../$(HISTORY)
+HISTORY_LOCATION_GIT = "https://github.com/H3xept/BareBonesHistory"
+
 all: compile
 
 compile: taget_dir prepare_dependencies
@@ -31,8 +35,29 @@ prepare_dependencies:
 	@ if [ ! -d $(DEPENDENCIES_FOLDER)/$(READLINE) ]; then \
 		make dep_READLINE; \
 	fi;
+	@ if [ ! -d $(DEPENDENCIES_FOLDER)/$(HISTORY) ]; then \
+		make dep_HISTORY; \
+	fi;
 	@ if [ ! -d $(PYTHON_DEPENDENCIES_FOLDER)/$(COLOR_TEXT) ]; then \
 		make dep_COLOR_TEXT; \
+	fi;
+
+dep_HISTORY:
+	@ mkdir -p $(DEPENDENCIES_FOLDER)/$(HISTORY)
+	@ if [ -d $(HISTORY_LOCATION) ]; then\
+		echo "Folder found locally, running make..."; \
+		echo "Making $$HISTORY ... "; \
+		make -C $(HISTORY_LOCATION); \
+		cp $(HISTORY_LOCATION)/bin/headers/*.h $(DEPENDENCIES_FOLDER)/$(HISTORY)/ ; \
+		cp $(HISTORY_LOCATION)/bin/libs/*.a $(DEPENDENCIES_FOLDER)/libs ; \
+	else \
+		echo "Fonder not found, cloning ..."; \
+		git clone $(HISTORY_LOCATION_GIT) $(HISTORY); \
+		echo "Making $$HISTORY ..." ; \
+		make -C $(HISTORY); \
+		cp $(HISTORY)/bin/headers/*.h $(DEPENDENCIES_FOLDER)/$(HISTORY)/ ; \
+		cp $(HISTORY)/bin/libs/*.a $(DEPENDENCIES_FOLDER)/libs ; \
+		rm -rf $(HISTORY); \
 	fi;
 
 dep_COLOR_TEXT:
