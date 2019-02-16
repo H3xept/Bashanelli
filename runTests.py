@@ -10,7 +10,7 @@ def runFunctionsStub(functions):
 
 def generateMainFromStub(filename, functions):
 	return f"#include \"{filename}\"\n #include \"tests/macros.h\"\nint main() {{ setup(); {runFunctionsStub(functions)} teardown(); \
-	printf(\"Tests executed \033[1m{len(functions)}\033[0m\"); puts(\"\"); puts(\"\"); return errno;}}"
+	printf(\"Tests executed \033[1m{len(functions)}\033[0m\"); puts(\"\"); puts(\"\");}}"
 
 def run_tests_for_file(filename):
 	print(f"\033[1mPreparing tests for '{filename.split('/')[-1][:-2]}'\033[0m")

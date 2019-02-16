@@ -37,34 +37,38 @@
 }
 
 #define assert_true(COND) {\
-	if (!COND) {\
+	if (!(COND)) {\
 		__explanation_separator();\
 		printf("Expected true condition.\n");\
+		printf("Line: %d - %s\n",__LINE__, __FILE__);\
 		__explanation_separator();\
 		exit(-1);\
 	}\
 }
 
 #define assert_eq_int(NUM1, NUM2) {\
-	if (NUM1 != NUM2) {\
+	if ((NUM1 != NUM2)) {\
 		__explanation_separator();\
 		printf("Expected %d, got %d \n",NUM1,NUM2);\
+		printf("Line: %d - %s\n",__LINE__, __FILE__);\
 		__explanation_separator();\
 	}\
 }
 
 #define assert_eq_float(NUM1, NUM2) {\
-	if (NUM1 != NUM2) {\
+	if ((NUM1 != NUM2)) {\
 		__explanation_separator();\
 		printf("Expected %f | got %f \n",NUM1,NUM2);\
+		printf("Line: %d - %s\n",__LINE__, __FILE__);\
 		__explanation_separator();\
 	}\
 }
 
 #define assert_eq_double(NUM1, NUM2) {\
-	if (NUM1 != NUM2) {\
+	if ((NUM1 != NUM2)) {\
 		__explanation_separator();\
 		printf("Expected %ld | got %ld \n",NUM1,NUM2);\
+		printf("Line: %d - %s\n",__LINE__, __FILE__);\
 		__explanation_separator();\
 	}\
 }
@@ -73,6 +77,7 @@
 	if (strcmp(S1,S2)) {\
 		__explanation_separator();\
 		printf("Expected %s | got %s \n",S1,S2);\
+		printf("Line: %d - %s\n",__LINE__, __FILE__);\
 		__explanation_separator();\
 	}\
 }
