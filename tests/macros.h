@@ -1,47 +1,80 @@
 #ifndef __UT_MACROS__
 #define __UT_MACROS__
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
 #include <ANSIsACurse/characters.h>
+#include <ANSIsACurse/cursor.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <signal.h>
 
-#define _test_failed_ex_rec(line_n, expected, received) \
-	c_color(C_COLOR_CODE_Red);\
-	r_printf(" x - line: %d\n| Expected: %s\n| Received: %s\n", line_n, expected, received);\
-	c_reset();\
-	errno = -1;
+#define EXPLANATION_SEPARATOR "-------------------"
+#define __explanation_separator() printf(EXPLANATION_SEPARATOR "\n")
 
-#define _test_failed(line_n) \
-	c_color(C_COLOR_CODE_Red);\
-	printf(" x - line: %d\n", line_n);\
-	c_reset();\
-	errno = -1;
+#define run_test(test_func) {\
+	printf("-> %s \n",#test_func);\
+	pid_t pid = fork();\
+	int status;\
+	if (!pid) {\
+		test_func();\
+	} else {\
+		waitpid(pid, &status, 0);\
+		if (WEXITSTATUS(status) != 0) {\
+			c_color(31);\
+			c_decorate(C_DECORATION_Bold);\
+			printf("Test %s failed!\n",#test_func);\
+			c_color(0);\
+		} else if (WIFEXITED(status)){\
+			exit(0);\
+		} else if (WIFSIGNALED(status)){\
+			c_color(31);\
+			c_decorate(C_DECORATION_Bold);\
+			printf("[%s] forcefully terminated.\nSignal: %s\n",#test_func,strsignal(WTERMSIG(status)));\
+			c_color(0);\
+		}\
+	}\
+}
 
-#define _test_passed() \
-	c_color(C_COLOR_CODE_Green);\
-	printf(" ✓\n");\
-	c_reset();
+#define assert_true(COND) {\
+	if (!COND) {\
+		__explanation_separator();\
+		printf("Expected true condition.\n");\
+		__explanation_separator();\
+		exit(-1);\
+	}\
+}
 
-#define run_test(test_func) \
-	printf("-> %s",#test_func); \
-	test_func(); \
-	if (!errno) {_test_passed();}
+#define assert_eq_int(NUM1, NUM2) {\
+	if (NUM1 != NUM2) {\
+		__explanation_separator();\
+		printf("Expected %d, got %d \n",NUM1,NUM2);\
+		__explanation_separator();\
+	}\
+}
 
-#define assert_true_ex_rec(cond, expected, received) \
-	if (!(cond)) {_test_failed_ex_rec(__LINE__, expected, received); } 
+#define assert_eq_float(NUM1, NUM2) {\
+	if (NUM1 != NUM2) {\
+		__explanation_separator();\
+		printf("Expected %f | got %f \n",NUM1,NUM2);\
+		__explanation_separator();\
+	}\
+}
 
-#define assert_true(cond) \
-	if (!(cond)) {_test_failed(__LINE__); } 
+#define assert_eq_double(NUM1, NUM2) {\
+	if (NUM1 != NUM2) {\
+		__explanation_separator();\
+		printf("Expected %ld | got %ld \n",NUM1,NUM2);\
+		__explanation_separator();\
+	}\
+}
 
-#define assert_false(cond) \
-	assert_true(!(cond))
-
-#define assert_eq_num(int1, int2) \
-	assert_true_ex_rec(int1==int2, #int1, #int2)
-
-#define assert_eq_str(str1, str2) \
-	assert_true_ex_rec(!strcmp(str1, str2), str1, str2)
+#define assert_eq_str(S1, S2) {\
+	if (strcmp(S1,S2)) {\
+		__explanation_separator();\
+		printf("Expected %s | got %s \n",S1,S2);\
+		__explanation_separator();\
+	}\
+}
 
 #endif
