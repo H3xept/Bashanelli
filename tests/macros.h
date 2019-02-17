@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
+#include <errno.h>
+#include <sys/wait.h>
 
 #define EXPLANATION_SEPARATOR "-------------------"
 #define __explanation_separator() printf(EXPLANATION_SEPARATOR "\n")
@@ -18,6 +20,7 @@
 	int status;\
 	if (!pid) {\
 		test_func();\
+		exit(0);\
 	} else {\
 		waitpid(pid, &status, 0);\
 		if (WEXITSTATUS(status) != 0) {\
@@ -25,13 +28,15 @@
 			c_decorate(C_DECORATION_Bold);\
 			printf("Test %s failed!\n",#test_func);\
 			c_color(0);\
+			errno = -1;\
 		} else if (WIFEXITED(status)){\
-			exit(0);\
+			\
 		} else if (WIFSIGNALED(status)){\
 			c_color(31);\
 			c_decorate(C_DECORATION_Bold);\
 			printf("[%s] forcefully terminated.\nSignal: %s\n",#test_func,strsignal(WTERMSIG(status)));\
 			c_color(0);\
+			errno = -1;\
 		}\
 	}\
 }
