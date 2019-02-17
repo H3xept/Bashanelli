@@ -3,28 +3,32 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <err.h>
 
 int handle_script(char *filename) {
 
 
 	unsigned int lines;
-	char **scrlines;
-	char *inpath;
+	char **scrlines = 0;
+	char *inpath = 0;
 	inpath = search_path(filename);
-	printf("%sITSOUT",inpath );
 	if(inpath) {
 		scrlines = read_file(inpath, &lines);
 	} else {
 		scrlines = read_file(filename, &lines);
 	}
 
-	//int c = 0;
-	//while(c < lines) {
-		//parse_line(scrlines[c]);
-		//execute_stuff(the_parsed_line)
-	//	c++;
-	//}
+	if(!scrlines)
+		return 1;
 
+	int c = 0;
+	warn("execute command not implemented");
+	warn("parse line not implemented");
+	while(c < lines) {
+		//parse_line(scrlines[c]);
+		//execute_stuff(the_parsed_line);
+		c++;
+	}
 	free(scrlines);
 
 	return 0;
@@ -83,7 +87,6 @@ char *search_path(char* filename) {
 		strcpy(ret, tempath);
 		strcat(ret,"/");
 		strcat(ret, filename);
-		printf("%s\n",ret );
 		fp = fopen(ret,"r");
 		if (fp) {
 			fclose(fp);
