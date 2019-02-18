@@ -57,7 +57,9 @@ char **read_file(char* filepath, unsigned int *lcount) {
 			*lcount *= 2;
 			lines = realloc(lines,*lcount*sizeof(char *));
 		}
-		lines[c] = strdup(tmp);
+		//lines[c] = strdup(tmp); //removed because it broke in main (c99???)
+		lines[c] = malloc(strlen(tmp)*sizeof(char)+1);
+		strcpy(lines[c],tmp);
 		REMOVE_NEWLINE(lines[c])
 		c++;
 		tmp = 0;
