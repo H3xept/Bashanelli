@@ -7,10 +7,10 @@
 
 int handle_script(char *filename) {
 
-
 	unsigned int lines;
 	char **scrlines = 0;
 	char *inpath = 0;
+
 	inpath = search_path(filename);
 	if(inpath) {
 		scrlines = read_file(inpath, &lines);
@@ -30,14 +30,13 @@ int handle_script(char *filename) {
 		c++;
 	}
 	free(scrlines);
-
 	return 0;
 }
 
 //reads file line by line and returns malloced char** 
 //if (line count) *lcount < actual number of lines in the file then *lcount is increased accordingly
 char **read_file(char* filepath, unsigned int *lcount) {
-
+	
 	*lcount = 10; //default size, IK magic numbers are probably bad but whatever, it stops uninitialised and 0 lcount from breaking it.
 	FILE* sfp = fopen(filepath,"r");
 	if (!sfp) {
@@ -52,7 +51,6 @@ char **read_file(char* filepath, unsigned int *lcount) {
 	errno = 0;
 
 	while (getline(&tmp,&n,sfp) != -1 && !errno) {
-		//expands size if > lcount lines 
 		if (c == *lcount) {
 			*lcount *= 2;
 			lines = realloc(lines,*lcount*sizeof(char *));
@@ -76,7 +74,6 @@ char *search_path(char* filename) {
 
 	FILE *fp;
 	char *path, *ret, *tempath;
-
 	path = malloc(strlen(getenv("PATH"))*sizeof(char)+1);
 	strcpy(path,getenv("PATH"));
 
