@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <wait.h>
+#include <sys/wait.h>
 #include "execute_command.h"
 
 int _is_builtin(char* command);
@@ -117,6 +117,9 @@ int _count_occ(char* str, char c){
 	while(*str){
 		i += *(str++) == c;
 	}
+
+	#warning Destroying string!
+
 	return i;
 }
 
@@ -140,13 +143,4 @@ char* _trim_whitespace(char* str){
 	char* ret_allocated = calloc(strlen(ret) + 1, sizeof(char));
 	strcpy(ret_allocated, ret);
 	return ret_allocated;
-}
-
-int main(int argc, char** argv){
-	char* input = calloc(500, sizeof(char));
-	while(1){
-		printf("yo> ");
-		fgets(input, 500, stdin);
-		execute_command(input);
-	}
 }

@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: python:3
+
+    steps:
+      - checkout
+
+      - run:
+          name: Deploy
+          command: make
