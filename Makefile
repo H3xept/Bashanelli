@@ -22,7 +22,7 @@ HISTORY = BareBonesHistory
 HISTORY_LOCATION = ../$(HISTORY)
 HISTORY_LOCATION_GIT = "https://github.com/H3xept/BareBonesHistory"
 
-all: compile
+all: taget_dir prepare_dependencies test compile
 
 compile: taget_dir prepare_dependencies
 	@ echo "Compiling..."
