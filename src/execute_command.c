@@ -3,7 +3,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <err.h>
+
 #include "execute_command.h"
+#include "script_handling.h"
 
 int _is_builtin(char* command);
 int _is_executable(char* command);
@@ -15,7 +18,7 @@ int _file_exists(char* filename);
 // Does not parse or handle redirection stuff, should be handled beforehand.
 // Currently takes a string containing the entire command text, which is parsed into argv.
 // This functionality should probably be moved elsewhere.
-void execute_command(char* command){
+void execute_command(const char* command){
 	command = _trim_whitespace(command);
 	if(!*command){
 		return;
@@ -46,7 +49,7 @@ void execute_command(char* command){
 	free(argv_base);
 }
 
-void execute_builtin(char* command, char** argv){
+void execute_builtin(const char* command, const char** argv){
 	// temp
 	int cid = _is_builtin(command);
 	switch(cid){
@@ -55,13 +58,12 @@ void execute_builtin(char* command, char** argv){
 	}
 }
 
-void execute_shell_script(char* filename, char** argv){
-	// Parse and execute each line in script
-	printf("shell script\n");
-	return;
+void execute_shell_script(const char* filename, const char** argv){
+	warn("Shell script argv support not implemented. Executing without args...")
+	handle_script(filename);
 }
 
-void execute_bin(char* filename, char** argv){
+void execute_bin(const char* filename, const char** argv){
 	pid_t pid = fork();
 	if(!pid){
 		if(execvp(filename, argv) == -1){
@@ -75,7 +77,7 @@ void execute_bin(char* filename, char** argv){
 	}
 }
 
-char** _generate_argv(char* command){
+char** _generate_argv(const char* command){
 	if(!*command){
 		return NULL;
 	}
@@ -92,11 +94,11 @@ char** _generate_argv(char* command){
 	return argv;
 }
 
-int _is_builtin(char* command){
+int _is_builtin(const char* command){
 	return 0;
 }
 
-int _is_executable(char* filename){
+int _is_executable(const char* filename){
 	FILE* f = fopen(filename, "rb");
 	if(!f){
 		return 0;
@@ -112,18 +114,15 @@ int _is_executable(char* filename){
 		|| signature == SIGNATURE_ELF_REVERSE;
 }
 
-int _count_occ(char* str, char c){
-	int i = 0;
-	while(*str){
-		i += *(str++) == c;
+int _count_occ(const char* str, const char c){
+	int occurences = 0;
+	for(int i = 0; i < strlen(str); i++){
+		occurences += *(str + i) == c;
 	}
-
-	#warning Destroying string!
-
-	return i;
+	return occurences;
 }
 
-int _file_exists(char* filename){
+int _file_exists(const char* filename){
 	FILE* f = fopen(filename, "rb");
 	if(!f){
 		return 0;
@@ -132,7 +131,7 @@ int _file_exists(char* filename){
 	return 1;
 }
 
-char* _trim_whitespace(char* str){
+char* _trim_whitespace(const char* str){
 	char* ret = str;
 	while(*ret == ' ' || *ret == '\n'){
 		ret++;

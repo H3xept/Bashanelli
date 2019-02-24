@@ -1,9 +1,11 @@
-#include "script_handling.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <err.h>
+
+#include "script_handling.h"
+#include "execute_command.h"
 
 int handle_script(char *filename) {
 
@@ -25,8 +27,9 @@ int handle_script(char *filename) {
 	warn("execute command not implemented");
 	warn("parse line not implemented");
 	while(c < lines) {
-		//parse_line(scrlines[c]);
-		//execute_stuff(the_parsed_line);
+		char* parsed_line = NULL; // Dummy variable, replace later.
+		//parsed_line = parse_line(scrlines[c]);
+		execute_command(parsed_line);
 		c++;
 	}
 	free(scrlines);
