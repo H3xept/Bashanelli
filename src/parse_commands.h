@@ -13,5 +13,6 @@ int count_occ(const char* str, char c); char* _trim_whitespace(const char* str);
 char** generate_argv(const char* command);
 int file_exists(const char* filename);
 char* trim_whitespace(const char* str);
+char** parse_command(const char *command);
 
 #endif

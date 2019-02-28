@@ -27,7 +27,7 @@ int handle_script(char *filename) {
 	warn("execute command not implemented");
 	warn("parse line not implemented");
 	while(c < lines) {
-		char* parsed_line = NULL; // Dummy variable, replace later.
+		char* parsed_line = "xyz"; // Dummy variable, replace later.
 		//parsed_line = parse_line(scrlines[c]);
 		execute_command(parsed_line);
 		c++;

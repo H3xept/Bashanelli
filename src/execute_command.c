@@ -15,16 +15,9 @@
 // Currently takes a string containing the entire command text, which is parsed into argv.
 // This functionality should probably be moved elsewhere.
 void execute_command(const char* command){
-	//added by ewan - it previously died when nullptr passed in
-	if(!command){
-		return;
-	}
-	command = trim_whitespace(command);
-	if(!*command){
-		return;
-	}
-	char** argv = generate_argv(command);
-	free(command);
+
+	return; //temp
+	char **argv = parse_command(command);
 	command = *argv;
 	if(file_exists(command)){
 		if(is_executable(command)){

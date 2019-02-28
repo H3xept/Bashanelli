@@ -8,11 +8,26 @@
 
 #include "parse_commands.h"
 
+char** parse_command(const char *command) {
+
+	return NULL; //temp
+	command = trim_whitespace(command);
+	if(!*command){
+		return;
+	}
+
+	//seperate on ; recursively parse?
+	//seperate into comm & args ("" and '' to contain literal args)
+	char** argv = generate_argv(command);
+	free(command);
+	return argv;
+}
+
 char** generate_argv(const char* command){
 	if(!*command){
 		return NULL;
 	}
-	int argc = count_occ(command, ' ') + 1;
+	int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
 	char** argv = calloc(argc + 1, sizeof(char*));
 	char* arg = strtok(command, " ");
 	for(int i = 0; i < argc; i++){
