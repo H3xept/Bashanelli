@@ -9,7 +9,7 @@
 
 int handle_script(char *filename) {
 
-	unsigned int lines;
+	unsigned int lines = 0;
 	char **scrlines = 0;
 	char *inpath = 0;
 

@@ -4,21 +4,26 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <err.h>
+#include <stdint.h>
 
 #include "execute_command.h"
 #include "script_handling.h"
 
-int _is_builtin(char* command);
-int _is_executable(char* command);
-int _count_occ(char* str, char c);
-char* _trim_whitespace(char* str);
-char** _generate_argv(char* command);
-int _file_exists(char* filename);
+int _is_builtin(const char* command);
+int _is_executable(const char* command);
+int _count_occ(const char* str, char c);
+char* _trim_whitespace(const char* str);
+char** _generate_argv(const char* command);
+int _file_exists(const char* filename);
 
 // Does not parse or handle redirection stuff, should be handled beforehand.
 // Currently takes a string containing the entire command text, which is parsed into argv.
 // This functionality should probably be moved elsewhere.
 void execute_command(const char* command){
+	//added by ewan - it previously died when nullptr passed in
+	if(!command){
+		return;
+	}
 	command = _trim_whitespace(command);
 	if(!*command){
 		return;
@@ -59,7 +64,7 @@ void execute_builtin(const char* command, const char** argv){
 }
 
 void execute_shell_script(const char* filename, const char** argv){
-	warn("Shell script argv support not implemented. Executing without args...")
+	warn("Shell script argv support not implemented. Executing without args...");
 	handle_script(filename);
 }
 
@@ -103,8 +108,8 @@ int _is_executable(const char* filename){
 	if(!f){
 		return 0;
 	}
-	u_int32_t signature = 0;
-	fread(&signature, 1, sizeof(u_int32_t), f);
+	uint32_t signature = 0;
+	fread(&signature, 1, sizeof(uint32_t), f);
 	fclose(f);
 	#ifdef __MACH__
 	return signature == SIGNATURE_MACH_O
