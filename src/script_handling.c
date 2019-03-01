@@ -6,6 +6,7 @@
 
 #include "script_handling.h"
 #include "execute_command.h"
+#define MAX_CMD_LEN 500
 
 int handle_script(char *filename) {
 
@@ -24,12 +25,8 @@ int handle_script(char *filename) {
 		return 1;
 
 	int c = 0;
-	warn("execute command not implemented");
-	warn("parse line not implemented");
 	while(c < lines) {
-		char* parsed_line = "xyz"; // Dummy variable, replace later.
-		//parsed_line = parse_line(scrlines[c]);
-		execute_command(parsed_line);
+		execute_command(scrlines[c]);
 		c++;
 	}
 	free(scrlines);

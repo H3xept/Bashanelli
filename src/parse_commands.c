@@ -5,26 +5,27 @@
 #include <sys/wait.h>
 #include <err.h>
 #include <stdint.h>
+#define MAX_ARG_AMT 50
 
 #include "parse_commands.h"
 
-char** parse_command(const char *command) {
+char** parse_command(char *command) {
 
-	return NULL; //temp
 	command = trim_whitespace(command);
 	if(!*command){
-		return;
+		return 0;
 	}
 
-	//seperate on ; recursively parse?
-	//seperate into comm & args ("" and '' to contain literal args)
 	char** argv = generate_argv(command);
 	free(command);
 	return argv;
 }
 
-char** generate_argv(const char* command){
-	if(!*command){
+
+	//seperate on ; recursively parse?
+	//seperate into comm & args ("" and '' to contain literal args)
+char **seperate_into_commands(char *command) {
+		if(!*command){
 		return NULL;
 	}
 	int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
@@ -40,11 +41,42 @@ char** generate_argv(const char* command){
 	return argv;
 }
 
-int is_builtin(const char* command){
+char** generate_argv(char* command){
+	if(!*command){
+		return NULL;
+	}
+	//int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
+
+
+	char *arg;
+	int i = 0;
+	char** argv = calloc(MAX_ARG_AMT, sizeof(char*));
+	if(strchr(command,'"') && (strchr(command,'"') < strchr(command,' '))){
+		
+	} else {
+		arg = strtok(command, " ");
+	}
+
+	while(arg != NULL){
+		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
+		strcpy(*(argv + i), arg);
+		arg = strtok(NULL, " ");
+		i++;
+	}
+	*(argv + i) = NULL;
+	//int i = 1;
+	return argv;
+}
+
+char *get_quoted_arg(char *arg, char *endptr) {
+
+}
+
+int is_builtin(char* command){
 	return 0;
 }
 
-int is_executable(const char* filename){
+int is_executable(char* filename){
 	FILE* f = fopen(filename, "rb");
 	if(!f){
 		return 0;
@@ -60,7 +92,7 @@ int is_executable(const char* filename){
 		|| signature == SIGNATURE_ELF_REVERSE;
 }
 
-int count_occ(const char* str, const char c){
+int count_occ(char* str, char c){
 	int occurences = 0;
 	for(int i = 0; i < strlen(str); i++){
 		occurences += *(str + i) == c;
@@ -68,7 +100,7 @@ int count_occ(const char* str, const char c){
 	return occurences;
 }
 
-int file_exists(const char* filename){
+int file_exists(char* filename){
 	FILE* f = fopen(filename, "rb");
 	if(!f){
 		return 0;
@@ -77,7 +109,7 @@ int file_exists(const char* filename){
 	return 1;
 }
 
-char* trim_whitespace(const char* str){
+char* trim_whitespace(char* str){
 	char* ret = str;
 	while(*ret == ' ' || *ret == '\n'){
 		ret++;

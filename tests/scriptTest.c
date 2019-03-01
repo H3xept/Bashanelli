@@ -46,9 +46,14 @@ void test_read_file_in_path() {
 	assert_true(count > 200);
 }
 
-void test_run_script_in_path() {
-	int ret = handle_script("ls");
+void test_run_script_ls() {
+	FILE *fp = fopen("lstest","w");
+	fputs("ls\n",fp);
+	fputs("ls -a\n",fp);	
+	fclose(fp);
+	int ret = handle_script("./lstest");
 	assert_eq_int(ret,0);
+	remove("lstest");
 }
 
 void test_read_in_current_dir() {

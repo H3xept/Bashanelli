@@ -20,10 +20,16 @@ void test_generate_argv() {
 	assert_eq_str(*(args+1),"-a");
 }
 
-void test_file_exists(){
+void test_file_exists() {
 	FILE *fp = fopen("loltest","w");
 	assert_true(file_exists("loltest"));
 	remove("loltest");
+}
+
+void test_trim_outside_whitespace() {
+	char str1[] = "     some words    ";
+	char *str2 = trim_whitespace(str1);
+	assert_eq_str(str2,"some words");
 }
 
 void teardown(){
