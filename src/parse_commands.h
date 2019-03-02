@@ -8,20 +8,11 @@
 #define SIGNATURE_ELF_REVERSE 0x464c457f
 
 
-int is_builtin( char* command);
-
-
-int is_executable( char* command);
-
 
 int count_occ( char* str, char c);
 
 
 char** generate_argv( char* command);
-
-
-int file_exists( char* filename);
-
 
 char* trim_whitespace( char* str);
 
@@ -31,8 +22,5 @@ char** parse_command( char *command);
 //input full line of commands and pipeline/redirection symbols
 char **seperate_into_commands( char *command);
 
-char *get_quoted_arg(char *arg, char **endptr);
-
-char *get_unquoted_arg(char *arg, char **endptr);
 
 #endif

@@ -7,14 +7,12 @@
 #include <stdint.h>
 #define MAX_CMD_LEN 500
 #define MAX_ARG_AMT 50
-#define ARG_HAS_QUOTES(x) (  x!=NULL && strchr(x,'"') && ( (strchr(x,'"') < strchr(x,' ')) && (strchr(x,'"') < strchr(x,'\0')) )  )
+#define ARG_HAS_QUOTES(x) ((x!=NULL && (strchr(x,'"')!=NULL)))
 
 #include "parse_commands.h"
 
 //custom strtok for handling quoted args, ignoring spaces etc.
-char *_get_quoted_arg(char *arg, char **endptr);
-
-char *_get_unquoted_arg(char *arg, char **endptr);
+char *_get_arg(char *arg, char **endptr);
 
 char** parse_command(char *command) {
 
@@ -28,9 +26,6 @@ char** parse_command(char *command) {
 	return argv;
 }
 
-
-	//seperate on ; recursively parse?
-	//seperate into comm & args ("" and '' to contain literal args)
 char **seperate_into_commands(char *command) {
 		if(!*command){
 		return NULL;
@@ -50,63 +45,24 @@ char **seperate_into_commands(char *command) {
 
 char** generate_argv(char* command){
 	if(!*command){
-		return NULL;
+	 	return NULL;
 	}
-	//int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
+	// //int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
 	char *arg;
 	int i = 0;
 	char *nextarg;
 	char** argv = calloc(MAX_ARG_AMT, sizeof(char*));
-	if(ARG_HAS_QUOTES(command)){
-		arg = _get_quoted_arg(command, &nextarg);
-	} else {
-		arg = _get_unquoted_arg(command, &nextarg);
-	}
-
+	arg = _get_arg(command,&nextarg);
 	while(arg != NULL) {
-		//*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
-		*(argv + i) = arg;
-		//strcpy(*(argv + i), arg);
-		if(ARG_HAS_QUOTES(nextarg)){
-			arg = _get_quoted_arg(nextarg, &nextarg);
-		} else {
-			arg = _get_unquoted_arg(nextarg, &nextarg);
-		}
-		i++;
+	 	*(argv + i) = arg;
+		arg = _get_arg(nextarg,&nextarg);
+	 	i++;
 	}
 	*(argv + i) = NULL;
-	//int i = 1;
 	return argv;
 }
 
-char *_get_quoted_arg(char *arg, char **endptr) {
-	if (!ARG_HAS_QUOTES(arg)){
-		*endptr = NULL;
-		return NULL;
-	}
-	char temp[MAX_CMD_LEN] = {0};
-	int quotes = 0;
-	int i = 0;
-	int c = 0;
-	while(quotes < 2 || !(arg[i] == ' ' || arg[i] == '\0')) {
-		if(arg[i] != '"'){
-			temp[c] = arg[i];
-			c++;
-		} else {
-			quotes++;
-		}
-		i++;
-	}
-	while(arg[i] == ' ') {
-		i++;
-	}
-	char *ret = calloc(c,sizeof(char));
-	strcpy(ret,temp);
-	*endptr = (arg + i);
-	return ret; 
-}
-
-char *_get_unquoted_arg(char *arg, char **endptr) {
+char *_get_arg(char *arg, char **endptr) {
 	if (!arg || !*arg){
 		*endptr = NULL;
 		return NULL;
@@ -114,37 +70,40 @@ char *_get_unquoted_arg(char *arg, char **endptr) {
 
 	char temp[MAX_CMD_LEN] = {0};
 	int i = 0;
-	while(!(arg[i] == ' ' || arg[i] == '\0')) {
-		temp[i] = arg[i];
+	int c = 0;
+	int inq = 0;
+	int indq = 0;
+	int cont = 1;
+	while(cont) {
+		
+		switch(arg[i]) {
+			case '"':
+				inq = (inq) ? 0 : 1;
+				break;
+			case ' ':
+				cont = (inq) ? 1 : 0;
+				if(inq){
+					temp[c] = arg[i];
+					c++;
+				}
+				break;
+			case '\0':
+				cont = (inq) ? 1 : 0;
+				break;
+			default:
+				temp[c] = arg[i];
+				c++;
+				break;
+		}
 		i++;
 	}
-	char *ret = calloc(i+1,sizeof(char));
+	char *ret = calloc(c,sizeof(char));
 	strcpy(ret,temp);
 	while(arg[i] == ' ') {
 		i++;
 	}
 	*endptr = (arg + i);
 	return ret; 
-}
-
-int is_builtin(char* command){
-	return 0;
-}
-
-int is_executable(char* filename){
-	FILE* f = fopen(filename, "rb");
-	if(!f){
-		return 0;
-	}
-	uint32_t signature = 0;
-	fread(&signature, 1, sizeof(uint32_t), f);
-	fclose(f);
-	#ifdef __MACH__
-	return signature == SIGNATURE_MACH_O
-		|| signature == SIGNATURE_MACH_O_REVERSE;
-	#endif
-	return signature == SIGNATURE_ELF
-		|| signature == SIGNATURE_ELF_REVERSE;
 }
 
 int count_occ(char* str, char c){
@@ -153,15 +112,6 @@ int count_occ(char* str, char c){
 		occurences += *(str + i) == c;
 	}
 	return occurences;
-}
-
-int file_exists(char* filename){
-	FILE* f = fopen(filename, "rb");
-	if(!f){
-		return 0;
-	}
-	fclose(f);
-	return 1;
 }
 
 char* trim_whitespace(char* str){

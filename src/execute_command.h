@@ -15,4 +15,10 @@ void execute_shell_script( char* filename,  char** argv);
 // Executes given command + args as if it were a binary file (program).
 void execute_bin( char* filename,  char** argv);
 
+int is_builtin( char* command);
+
+int is_executable( char* command);
+
+int file_exists( char* filename);
+
 #endif

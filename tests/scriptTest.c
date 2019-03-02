@@ -6,7 +6,6 @@ void setup(){
 	return;
 }
 
-
 void test_read_empty_file(){
 	FILE *fp = fopen("loltest","w");
 	fclose(fp);

@@ -69,5 +69,35 @@ void execute_bin(char* filename, char** argv){
 	}
 }
 
+int is_builtin(char* command){
+	return 0;
+}
+
+int is_executable(char* filename){
+	FILE* f = fopen(filename, "rb");
+	if(!f){
+		return 0;
+	}
+	uint32_t signature = 0;
+	fread(&signature, 1, sizeof(uint32_t), f);
+	fclose(f);
+	#ifdef __MACH__
+	return signature == SIGNATURE_MACH_O
+		|| signature == SIGNATURE_MACH_O_REVERSE;
+	#endif
+	return signature == SIGNATURE_ELF
+		|| signature == SIGNATURE_ELF_REVERSE;
+}
+
+
+int file_exists(char* filename){
+	FILE* f = fopen(filename, "rb");
+	if(!f){
+		return 0;
+	}
+	fclose(f);
+	return 1;
+}
+
 
 

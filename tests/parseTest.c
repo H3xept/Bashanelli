@@ -1,7 +1,7 @@
 #include "macros.h"
 #include "parseTest.h"
 #include "../src/parse_commands.h"
-
+#include "../src/execute_command.h"
 
 void setup(){
 	return;
@@ -35,6 +35,13 @@ void test_generate_argv_with_quotes2() {
 	assert_eq_str(*(args+2),"xy z");
 }
 
+void test_generate_argv_with_quotes3() {
+	char str[] = {  '"',  '"',  'l',  's',  ' ',  'a',  ' ',  'b',  '"',  '"',  '\0'  };
+	char **args = generate_argv(str);
+	assert_eq_str(*args,"ls");
+	assert_eq_str(*(args+1),"a");
+	assert_eq_str(*(args+2),"b");
+}
 
 void test_generate_argv_one_quoted_arg() {
 	char str[] = {  '"',  'l',  's',  ' ',  '-',  'a',  '"',  ' ',  'x',  'y', 'z',  ' ',  'a',  '\0'  };
