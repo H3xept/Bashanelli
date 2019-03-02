@@ -5,9 +5,16 @@
 #include <sys/wait.h>
 #include <err.h>
 #include <stdint.h>
+#define MAX_CMD_LEN 500
 #define MAX_ARG_AMT 50
+#define ARG_HAS_QUOTES(x) (  x!=NULL && strchr(x,'"') && ( (strchr(x,'"') < strchr(x,' ')) && (strchr(x,'"') < strchr(x,'\0')) )  )
 
 #include "parse_commands.h"
+
+//custom strtok for handling quoted args, ignoring spaces etc.
+char *_get_quoted_arg(char *arg, char **endptr);
+
+char *_get_unquoted_arg(char *arg, char **endptr);
 
 char** parse_command(char *command) {
 
@@ -46,21 +53,25 @@ char** generate_argv(char* command){
 		return NULL;
 	}
 	//int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
-
-
 	char *arg;
 	int i = 0;
+	char *nextarg;
 	char** argv = calloc(MAX_ARG_AMT, sizeof(char*));
-	if(strchr(command,'"') && (strchr(command,'"') < strchr(command,' '))){
-		
+	if(ARG_HAS_QUOTES(command)){
+		arg = _get_quoted_arg(command, &nextarg);
 	} else {
-		arg = strtok(command, " ");
+		arg = _get_unquoted_arg(command, &nextarg);
 	}
 
-	while(arg != NULL){
-		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
-		strcpy(*(argv + i), arg);
-		arg = strtok(NULL, " ");
+	while(arg != NULL) {
+		//*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
+		*(argv + i) = arg;
+		//strcpy(*(argv + i), arg);
+		if(ARG_HAS_QUOTES(nextarg)){
+			arg = _get_quoted_arg(nextarg, &nextarg);
+		} else {
+			arg = _get_unquoted_arg(nextarg, &nextarg);
+		}
 		i++;
 	}
 	*(argv + i) = NULL;
@@ -68,8 +79,52 @@ char** generate_argv(char* command){
 	return argv;
 }
 
-char *get_quoted_arg(char *arg, char *endptr) {
+char *_get_quoted_arg(char *arg, char **endptr) {
+	if (!ARG_HAS_QUOTES(arg)){
+		*endptr = NULL;
+		return NULL;
+	}
+	char temp[MAX_CMD_LEN] = {0};
+	int quotes = 0;
+	int i = 0;
+	int c = 0;
+	while(quotes < 2 || !(arg[i] == ' ' || arg[i] == '\0')) {
+		if(arg[i] != '"'){
+			temp[c] = arg[i];
+			c++;
+		} else {
+			quotes++;
+		}
+		i++;
+	}
+	while(arg[i] == ' ') {
+		i++;
+	}
+	char *ret = calloc(c,sizeof(char));
+	strcpy(ret,temp);
+	*endptr = (arg + i);
+	return ret; 
+}
 
+char *_get_unquoted_arg(char *arg, char **endptr) {
+	if (!arg || !*arg){
+		*endptr = NULL;
+		return NULL;
+	}
+
+	char temp[MAX_CMD_LEN] = {0};
+	int i = 0;
+	while(!(arg[i] == ' ' || arg[i] == '\0')) {
+		temp[i] = arg[i];
+		i++;
+	}
+	char *ret = calloc(i+1,sizeof(char));
+	strcpy(ret,temp);
+	while(arg[i] == ' ') {
+		i++;
+	}
+	*endptr = (arg + i);
+	return ret; 
 }
 
 int is_builtin(char* command){

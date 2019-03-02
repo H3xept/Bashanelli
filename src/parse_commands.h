@@ -31,4 +31,8 @@ char** parse_command( char *command);
 //input full line of commands and pipeline/redirection symbols
 char **seperate_into_commands( char *command);
 
+char *get_quoted_arg(char *arg, char **endptr);
+
+char *get_unquoted_arg(char *arg, char **endptr);
+
 #endif

@@ -20,6 +20,30 @@ void test_generate_argv() {
 	assert_eq_str(*(args+1),"-a");
 }
 
+void test_generate_argv_with_quotes() {
+	char str[] = {  '"',  'l',  's',  ' ',  '-',  'a',  '"',  ' ',  'x',  '"',  'y',  ' ',  '"',  'z',  '\0'  };
+	char **args = generate_argv(str);
+	assert_eq_str(*args,"ls -a");
+	assert_eq_str(*(args+1),"xy z");
+}
+
+void test_generate_argv_with_quotes2() {
+	char str[] = {  '"',  'l',  's',  '"', ' ',  '-',  'a',  ' ',  ' ',  'x',  '"',  'y',  ' ',  '"',  'z',  '\0'  };
+	char **args = generate_argv(str);
+	assert_eq_str(*args,"ls");
+	assert_eq_str(*(args+1),"-a");
+	assert_eq_str(*(args+2),"xy z");
+}
+
+
+void test_generate_argv_one_quoted_arg() {
+	char str[] = {  '"',  'l',  's',  ' ',  '-',  'a',  '"',  ' ',  'x',  'y', 'z',  ' ',  'a',  '\0'  };
+	char **args = generate_argv(str);
+	assert_eq_str(*args,"ls -a");
+	assert_eq_str(*(args+1),"xyz");
+	assert_eq_str(*(args+2),"a");
+}
+
 void test_file_exists() {
 	FILE *fp = fopen("loltest","w");
 	assert_true(file_exists("loltest"));
