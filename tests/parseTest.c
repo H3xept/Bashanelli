@@ -28,7 +28,7 @@ void test_generate_argv_with_quotes() {
 }
 
 void test_generate_argv_with_quotes2() {
-	char str[] = {  '"',  'l',  's',  '"', ' ',  '-',  'a',  ' ',  ' ',  'x',  '"',  'y',  ' ',  '"',  'z',  '\0'  };
+	char str[] = {  '"',  'l',  's',  '"', ' ',  '-',  'a',  ' ',  ' ',  '"',  'x',  'y',  ' ',  '"',  'z',  '\0'  };
 	char **args = generate_argv(str);
 	assert_eq_str(*args,"ls");
 	assert_eq_str(*(args+1),"-a");
@@ -49,6 +49,20 @@ void test_generate_argv_one_quoted_arg() {
 	assert_eq_str(*args,"ls -a");
 	assert_eq_str(*(args+1),"xyz");
 	assert_eq_str(*(args+2),"a");
+}
+
+void test_generate_argv_backslash_spaces() {
+	char str[] = {  'l',  's',  '\\',  ' ',  'a',  ' ',  'b',  '\0'  };
+	char **args = generate_argv(str);
+	assert_eq_str(*args,"ls a");
+	assert_eq_str(*(args+1),"b");
+}
+
+void test_generate_argv_another_backslash_escape() {
+	char str[] = {  'l',  's',  '\\',  'b',  'a',  ' ',  'b',  '\0'  };
+	char **args = generate_argv(str);
+	assert_eq_str(*args,"lsba");
+	assert_eq_str(*(args+1),"b");
 }
 
 void test_file_exists() {

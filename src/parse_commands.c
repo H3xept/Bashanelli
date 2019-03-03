@@ -77,6 +77,11 @@ char *_get_arg(char *arg, char **endptr) {
 	while(cont) {
 		
 		switch(arg[i]) {
+			case '\\':
+				i++;
+				temp[c] = arg[i];
+				c++;
+				break;
 			case '"':
 				inq = (inq) ? 0 : 1;
 				break;
