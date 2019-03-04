@@ -55,6 +55,17 @@ void test_run_script_ls() {
 	remove("lstest");
 }
 
+void test_run_script_ls_with_comments() {
+	FILE *fp = fopen("lstest","w");
+	fputs("ls #lol\n",fp);
+	fputs("#ls -a\n",fp);
+	fputs("ls # -a\n",fp);	
+	fclose(fp);
+	int ret = handle_script("./lstest");
+	assert_eq_int(ret,0);
+	remove("lstest");
+}
+
 void test_read_in_current_dir() {
 	int c;
 	read_file("./README.md",&c);
@@ -66,6 +77,7 @@ void test_read_in_parent_dir() {
 	read_file("../Makefile",&c);
 	assert_true(c > 0);
 }
+
 
 void teardown(){
 	return;

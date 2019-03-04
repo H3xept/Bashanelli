@@ -6,7 +6,9 @@
 
 #include "script_handling.h"
 #include "execute_command.h"
+#include "parse_commands.h"
 #define MAX_CMD_LEN 500
+#define DEAFAULT_LINES 50
 
 int handle_script(char *filename) {
 
@@ -26,7 +28,9 @@ int handle_script(char *filename) {
 
 	int c = 0;
 	while(c < lines) {
-		execute_command(scrlines[c]);
+		if(*scrlines[c]){
+			execute_command(scrlines[c]);			
+		}
 		c++;
 	}
 	free(scrlines);
@@ -37,7 +41,7 @@ int handle_script(char *filename) {
 //if (line count) *lcount < actual number of lines in the file then *lcount is increased accordingly
 char **read_file(char* filepath, unsigned int *lcount) {
 	
-	*lcount = 10; //default size, IK magic numbers are probably bad but whatever, it stops uninitialised and 0 lcount from breaking it.
+	*lcount = DEAFAULT_LINES; //default size, IK magic numbers are probably bad but whatever, it stops uninitialised and 0 lcount from breaking it.
 	FILE* sfp = fopen(filepath,"r");
 	if (!sfp) {
 		*lcount = 0;
@@ -51,14 +55,15 @@ char **read_file(char* filepath, unsigned int *lcount) {
 	errno = 0;
 
 	while (getline(&tmp,&n,sfp) != -1 && !errno) {
+		//realloc if too many lines
 		if (c == *lcount) {
 			*lcount *= 2;
 			lines = realloc(lines,*lcount*sizeof(char *));
 		}
-		//lines[c] = strdup(tmp); //removed because it broke in main (c99???)
 		lines[c] = malloc(strlen(tmp)*sizeof(char)+1);
 		strcpy(lines[c],tmp);
 		REMOVE_NEWLINE(lines[c])
+		ignore_comment(lines[c]);
 		c++;
 		tmp = 0;
 	}

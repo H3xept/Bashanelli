@@ -29,7 +29,8 @@ int main(int argc, char const *argv[])
 	history = read_history();
 
 	while(1) {
-		read_line("Shellerino Diocanarino$ ");
+		//init_readline();
+		//read_line("Shellerino Diocanarino$ ");
 		getchar();
 	}
 

@@ -1,3 +1,5 @@
+#include <ANSIsACurse/cursor.h>
+#include <BareBonesReadline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,10 +19,11 @@ char *_get_arg(char *arg, char **endptr);
 char** parse_command(char *command) {
 
 	command = trim_whitespace(command);
+	ignore_comment(command);
 	if(!*command){
 		return 0;
 	}
-
+	//read_line("Shellerino Diocanarino$ ");
 	char** argv = generate_argv(command);
 	free(command);
 	return argv;
@@ -130,4 +133,16 @@ char* trim_whitespace(char* str){
 	char* ret_allocated = calloc(strlen(ret) + 1, sizeof(char));
 	strcpy(ret_allocated, ret);
 	return ret_allocated;
+}
+
+void ignore_comment(char *line) {
+
+	if (*line == '#'){
+		*line = '\0';
+	}
+
+	char *comment = strchr(line,'#'); 
+	if (comment && *(comment-1) == ' '){
+		*(comment-1) = '\0';
+	}
 }
