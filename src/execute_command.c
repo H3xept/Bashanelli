@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include "execute_command.h"
@@ -101,8 +102,8 @@ int _is_executable(char* filename){
 	if(!f){
 		return 0;
 	}
-	u_int32_t signature = 0;
-	fread(&signature, 1, sizeof(u_int32_t), f);
+	uint32_t signature = 0;
+	fread(&signature, 1, sizeof(uint32_t), f);
 	fclose(f);
 	#ifdef __MACH__
 	return signature == SIGNATURE_MACH_O
