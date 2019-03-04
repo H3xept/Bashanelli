@@ -1,4 +1,5 @@
 #include <ANSIsACurse/characters.h>
+#include <BareBonesReadline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -28,7 +29,7 @@ int main(int argc, char const *argv[])
 	history = read_history();
 
 	while(1) {
-		printf("%s","Shellerino Diocanarino$ ");
+		read_line("POP");
 		getchar();
 	}
 

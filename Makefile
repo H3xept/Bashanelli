@@ -26,7 +26,7 @@ all: taget_dir prepare_dependencies test compile
 
 compile: taget_dir prepare_dependencies
 	@ echo "Compiling..."
-	@ $(CC) -g -I$(DEPENDENCIES_FOLDER) $(CFLAGS) $(SOURCE_FILES) $(DEPENDENCIES_FOLDER)/libs/*.a -o $(OUT_FOLDER)/$(OUT_NAME)
+	@ $(CC) -g -I$(DEPENDENCIES_FOLDER) $(CFLAGS) $(SOURCE_FILES) -L$(DEPENDENCIES_FOLDER)/libs/ -lansisacurse -lhistory -lreadline -o $(OUT_FOLDER)/$(OUT_NAME)
 
 prepare_dependencies: 
 	@ if [ ! -d $(DEPENDENCIES_FOLDER)/$(ANSI_IS_A_CURSE) ]; then \
