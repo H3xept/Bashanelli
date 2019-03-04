@@ -4,28 +4,23 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include "execute_command.h"
+#include <err.h>
+#include <stdint.h>
 
-int _is_builtin(char* command);
-int _is_executable(char* command);
-int _count_occ(char* str, char c);
-char* _trim_whitespace(char* str);
-char** _generate_argv(char* command);
-int _file_exists(char* filename);
+#include "execute_command.h"
+#include "script_handling.h"
+#include "parse_commands.h"
+
 
 // Does not parse or handle redirection stuff, should be handled beforehand.
 // Currently takes a string containing the entire command text, which is parsed into argv.
 // This functionality should probably be moved elsewhere.
 void execute_command(char* command){
-	command = _trim_whitespace(command);
-	if(!*command){
-		return;
-	}
-	char** argv = _generate_argv(command);
-	free(command);
+
+	char **argv = parse_command(command);
 	command = *argv;
-	if(_file_exists(command)){
-		if(_is_executable(command)){
+	if(file_exists(command)){
+		if(is_executable(command)){
 			execute_bin(command, argv);
 		}
 		else{
@@ -33,7 +28,7 @@ void execute_command(char* command){
 		}
 	}
 	else{
-		if(_is_builtin(command)){
+		if(is_builtin(command)){
 			execute_builtin(command, argv);
 		}
 		else{
@@ -49,7 +44,7 @@ void execute_command(char* command){
 
 void execute_builtin(char* command, char** argv){
 	// temp
-	int cid = _is_builtin(command);
+	int cid = is_builtin(command);
 	switch(cid){
 		case 1:
 			break;
@@ -57,9 +52,8 @@ void execute_builtin(char* command, char** argv){
 }
 
 void execute_shell_script(char* filename, char** argv){
-	// Parse and execute each line in script
-	printf("shell script\n");
-	return;
+	warn("Shell script argv support not implemented. Executing without args...");
+	handle_script(filename);
 }
 
 void execute_bin(char* filename, char** argv){
@@ -76,28 +70,11 @@ void execute_bin(char* filename, char** argv){
 	}
 }
 
-char** _generate_argv(char* command){
-	if(!*command){
-		return NULL;
-	}
-	int argc = _count_occ(command, ' ') + 1;
-	char** argv = calloc(argc + 1, sizeof(char*));
-	char* arg = strtok(command, " ");
-	for(int i = 0; i < argc; i++){
-		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
-		strcpy(*(argv + i), arg);
-		arg = strtok(NULL, " ");
-	}
-	*(argv + argc) = NULL;
-	int i = 1;
-	return argv;
-}
-
-int _is_builtin(char* command){
+int is_builtin(char* command){
 	return 0;
 }
 
-int _is_executable(char* filename){
+int is_executable(char* filename){
 	FILE* f = fopen(filename, "rb");
 	if(!f){
 		return 0;
@@ -113,18 +90,8 @@ int _is_executable(char* filename){
 		|| signature == SIGNATURE_ELF_REVERSE;
 }
 
-int _count_occ(char* str, char c){
-	int i = 0;
-	while(*str){
-		i += *(str++) == c;
-	}
 
-	#warning Destroying string!
-
-	return i;
-}
-
-int _file_exists(char* filename){
+int file_exists(char* filename){
 	FILE* f = fopen(filename, "rb");
 	if(!f){
 		return 0;
@@ -133,15 +100,5 @@ int _file_exists(char* filename){
 	return 1;
 }
 
-char* _trim_whitespace(char* str){
-	char* ret = str;
-	while(*ret == ' ' || *ret == '\n'){
-		ret++;
-	}
-	while(*(ret + strlen(ret) - 1) == ' ' || *(ret + strlen(ret) - 1) == '\n'){
-		*(ret + strlen(ret) - 1) = '\0';
-	}
-	char* ret_allocated = calloc(strlen(ret) + 1, sizeof(char));
-	strcpy(ret_allocated, ret);
-	return ret_allocated;
-}
+
+
