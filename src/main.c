@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
 	history = read_history();
 
 	while(1) {
-		read_line("POP");
+		read_line("Shellerino Diocanarino$ ");
 		getchar();
 	}
 
