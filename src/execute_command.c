@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 #include "execute_command.h"
 
 int _is_builtin(char* command);
