@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <err.h>
-
+#include <BareBonesReadline/readline.h>
 #include "script_handling.h"
 #include "execute_command.h"
 #include "parse_commands.h"
@@ -29,7 +29,9 @@ int handle_script(char *filename) {
 	int c = 0;
 	while(c < lines) {
 		if(*scrlines[c]){
-			execute_command(scrlines[c]);			
+			char* current_line = parse_line(scrlines[c]);
+			execute_command(current_line);
+			free(current_line);			
 		}
 		c++;
 	}

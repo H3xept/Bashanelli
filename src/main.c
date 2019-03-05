@@ -30,7 +30,8 @@ int main(int argc, char const *argv[])
 
 	while(1) {
 		init_readline();
-		read_line("Shellerino Diocanarino$ ");
+		char* line = read_line("Shellerino Diocanarino$ ");
+		execute_command(line);
 	}
 
 	printf("Env: %s",home_directory);

@@ -15,7 +15,6 @@
 // Currently takes a string containing the entire command text, which is parsed into argv.
 // This functionality should probably be moved elsewhere.
 void execute_command(const char* command){
-
 	char **argv = parse_command(command);
 	command = *argv;
 	if(file_exists(command)){
@@ -51,7 +50,7 @@ void execute_builtin(const char* command, const char** argv){
 }
 
 void execute_shell_script(const char* filename, const char** argv){
-	warn("Shell script argv support not implemented. Executing without args...");
+	printf("Shell script argv support not implemented. Executing without args...\n");
 	handle_script(filename);
 }
 
