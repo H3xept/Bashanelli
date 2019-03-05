@@ -24,7 +24,7 @@ def run_tests_for_file(filename):
 
 	print("Compiling...")
 	os.system(f"gcc -Idependencies -o run_test temp_test.c \
-		{filename[:-1]+'c'} $(find src/ -name '*.c' -a ! -name '*main.c') dependencies/libs/*.a")
+		{filename[:-1]+'c'} $(find src/ -name '*.c' -a ! -name '*main.c') -Ldependencies/libs/ -lreadline -lhistory -lansisacurse")
 	print("Running...")
 	ret = os.system(f"./run_test")
 

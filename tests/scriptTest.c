@@ -1,8 +1,10 @@
+#include <BareBonesReadline/readline.h>
 #include "macros.h"
 #include "scriptTest.h"
 #include "../src/script_handling.h"
 
 void setup(){
+	init_readline();
 	return;
 }
 
