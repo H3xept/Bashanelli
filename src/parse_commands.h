@@ -2,19 +2,19 @@
 #ifndef PARSE_COMMANDS
 #define PARSE_COMMANDS
 
-int count_occ( char* str, char c);
 
 
-char** generate_argv( char* command);
-
-char* trim_whitespace( char* str);
-
-//gets single command 
-char** parse_command( char *command);
+//gets single command, returns argv.
+char** parse_command(const char *command);
 
 //input full line of commands and pipeline/redirection symbols
-char **seperate_into_commands( char *command);
+char **seperate_into_commands(const char *command);
 
+char** generate_argv(char* command);
+
+char *get_arg(char *arg, char **endptr);
+int count_occ(const char* str, const char c);
+char* trim_whitespace(const char* str);
 void ignore_comment(char *line);
 
 #endif

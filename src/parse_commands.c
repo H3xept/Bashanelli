@@ -7,16 +7,20 @@
 #include <sys/wait.h>
 #include <err.h>
 #include <stdint.h>
+#include "parse_commands.h"
+
 #define MAX_CMD_LEN 500
 #define MAX_ARG_AMT 50
 #define ARG_HAS_QUOTES(x) ((x!=NULL && (strchr(x,'"')!=NULL)))
 
-#include "parse_commands.h"
+char *get_arg(char *arg, char **endptr);
+int count_occ(const char* str, const char c);
+char* trim_whitespace(const char* str);
 
-//custom strtok for handling quoted args, ignoring spaces etc.
-char *_get_arg(char *arg, char **endptr);
 
-char** parse_command(char *command) {
+
+
+char** parse_command(const char *command) {
 
 	char* parsed_command = trim_whitespace(command);
 	ignore_comment(parsed_command);
@@ -32,7 +36,7 @@ char** parse_command(char *command) {
 	return argv;
 }
 
-char **seperate_into_commands(char *command) {
+char **seperate_into_commands(const char *command) {
 		if(!*command){
 		return NULL;
 	}
@@ -58,17 +62,18 @@ char** generate_argv(char* command){
 	int i = 0;
 	char *nextarg;
 	char** argv = calloc(MAX_ARG_AMT, sizeof(char*));
-	arg = _get_arg(command,&nextarg);
+	arg = get_arg(command,&nextarg);
 	while(arg != NULL) {
 	 	*(argv + i) = arg;
-		arg = _get_arg(nextarg,&nextarg);
+		arg = get_arg(nextarg,&nextarg);
 	 	i++;
 	}
 	*(argv + i) = NULL;
 	return argv;
 }
 
-char *_get_arg(char *arg, char **endptr) {
+//custom strtok for handling quoted args, ignoring spaces etc.
+char *get_arg(char *arg, char **endptr) {
 	if (!arg || !*arg){
 		*endptr = NULL;
 		return NULL;
@@ -117,7 +122,7 @@ char *_get_arg(char *arg, char **endptr) {
 	return ret; 
 }
 
-int count_occ(char* str, char c){
+int count_occ(const char* str, const char c){
 	int occurences = 0;
 	for(int i = 0; i < strlen(str); i++){
 		occurences += *(str + i) == c;
@@ -125,7 +130,7 @@ int count_occ(char* str, char c){
 	return occurences;
 }
 
-char* trim_whitespace(char* str){
+char* trim_whitespace(const char* str){
 	char* ret = str;
 	while(*ret == ' ' || *ret == '\n'){
 		ret++;
@@ -139,15 +144,12 @@ char* trim_whitespace(char* str){
 }
 
 void ignore_comment(char *line) {
-
 	if (*line == '#'){
 		*line = '\0';
-		free(line + 1);
 	}
 
 	char *comment = strchr(line,'#'); 
 	if (comment && *(comment-1) == ' '){
 		*(comment-1) = '\0';
-		free(comment);
 	}
 }
