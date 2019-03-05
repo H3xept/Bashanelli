@@ -11,10 +11,6 @@
 #include "script_handling.h"
 #include "parse_commands.h"
 
-static int is_builtin(const char* command);
-static int is_executable(const char* filename);
-static int file_exists(const char* filename);
-
 // Does not parse or handle redirection stuff, should be handled beforehand.
 // Currently takes a string containing the entire command text, which is parsed into argv.
 // This functionality should probably be moved elsewhere.
@@ -73,11 +69,11 @@ void execute_bin(const char* filename, const char** argv){
 	}
 }
 
-static int is_builtin(const char* command){
+int is_builtin(const char* command){
 	return 0;
 }
 
-static int is_executable(const char* filename){
+int is_executable(const char* filename){
 	FILE* f = fopen(filename, "rb");
 	if(!f){
 		return 0;
@@ -94,7 +90,7 @@ static int is_executable(const char* filename){
 }
 
 
-static int file_exists(const char* filename){
+int file_exists(const char* filename){
 	FILE* f = fopen(filename, "rb");
 	if(!f){
 		return 0;

@@ -21,4 +21,8 @@ void execute_shell_script(const char* filename, const char** argv);
 // Executes given command + args as if it were a binary file (program).
 void execute_bin(const char* filename, const char** argv);
 
+int is_builtin(const char* command);
+int is_executable(const char* filename);
+int file_exists(const char* filename);
+
 #endif
