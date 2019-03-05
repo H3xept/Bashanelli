@@ -18,14 +18,17 @@ char *_get_arg(char *arg, char **endptr);
 
 char** parse_command(char *command) {
 
-	command = trim_whitespace(command);
-	ignore_comment(command);
+	char* parsed_command = trim_whitespace(command);
+	ignore_comment(parsed_command);
 	if(!*command){
 		return 0;
 	}
-	//read_line("Shellerino Diocanarino$ ");
-	char** argv = generate_argv(command);
-	free(command);
+	char* parsed_command_old = parsed_command;
+	parsed_command = parse_line(parsed_command);
+	free(parsed_command_old);
+
+	char** argv = generate_argv(parsed_command);
+	free(parsed_command);
 	return argv;
 }
 
@@ -139,10 +142,12 @@ void ignore_comment(char *line) {
 
 	if (*line == '#'){
 		*line = '\0';
+		free(line + 1);
 	}
 
 	char *comment = strchr(line,'#'); 
 	if (comment && *(comment-1) == ' '){
 		*(comment-1) = '\0';
+		free(comment);
 	}
 }

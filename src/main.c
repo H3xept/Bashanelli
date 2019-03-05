@@ -29,9 +29,8 @@ int main(int argc, char const *argv[])
 	history = read_history();
 
 	while(1) {
-		//init_readline();
-		//read_line("Shellerino Diocanarino$ ");
-		getchar();
+		init_readline();
+		read_line("Shellerino Diocanarino$ ");
 	}
 
 	printf("Env: %s",home_directory);
