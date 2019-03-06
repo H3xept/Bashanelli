@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "execute_command.h"
+
 #define MAX_CMD_LEN 500
 #define K_HOME_ENV "HOME"
 #define K_PATH_ENV "PATH"

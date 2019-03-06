@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <err.h>
 #include <stdint.h>
+
 #include "execute_command.h"
 #include "script_handling.h"
 #include "parse_commands.h"
@@ -16,6 +17,7 @@
 // This functionality should probably be moved elsewhere.
 void execute_command(const char* command){
 	char **argv = parse_command(command);
+	#warning CHANGE
 	command = *argv;
 	if(file_exists(command)){
 		if(is_executable(command)){
@@ -97,6 +99,3 @@ int file_exists(const char* filename){
 	fclose(f);
 	return 1;
 }
-
-
-

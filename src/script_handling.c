@@ -4,9 +4,11 @@
 #include <errno.h>
 #include <err.h>
 #include <BareBonesReadline/readline.h>
+
 #include "script_handling.h"
 #include "execute_command.h"
 #include "parse_commands.h"
+
 #define MAX_CMD_LEN 500
 #define DEAFAULT_LINES 50
 

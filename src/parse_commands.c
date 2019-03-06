@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 #include <err.h>
 #include <stdint.h>
+
 #include "parse_commands.h"
 
 #define MAX_CMD_LEN 500
@@ -16,9 +17,6 @@
 char *get_arg(char *arg, char **endptr);
 int count_occ(const char* str, const char c);
 char* trim_whitespace(const char* str);
-
-
-
 
 char** parse_command(const char *command) {
 

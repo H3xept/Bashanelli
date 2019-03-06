@@ -1,8 +1,5 @@
-
 #ifndef PARSE_COMMANDS
 #define PARSE_COMMANDS
-
-
 
 //gets single command, returns argv.
 char** parse_command(const char *command);
