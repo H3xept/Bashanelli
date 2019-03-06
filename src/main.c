@@ -32,10 +32,10 @@ int main(int argc, char const *argv[])
 	history = read_history();
 
 	startup(argc, argv);
+	int is_done = 0;
+	init_readline(&is_done);
 
-	init_readline();
-
-	while(1) {
+	while(!is_done) {
 		char* line = read_line("Shellerino Diocanarino$ ");
 		execute_command(line);
 	}

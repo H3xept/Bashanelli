@@ -11,6 +11,7 @@
 #include "execute_command.h"
 #include "script_handling.h"
 #include "parse_commands.h"
+#include "builtins.h"
 
 // Does not parse or handle redirection stuff, should be handled beforehand.
 // Currently takes a string containing the entire command text, which is parsed into argv.
@@ -43,12 +44,7 @@ void execute_command(const char* command){
 }
 
 void execute_builtin(const char* command, const char** argv){
-	// temp
-	int cid = is_builtin(command);
-	switch(cid){
-		case 1:
-			break;
-	}
+	exec_builtin_str(command, argv);
 }
 
 void execute_shell_script(const char* filename, const char** argv){
@@ -71,7 +67,7 @@ void execute_bin(const char* filename, const char** argv){
 }
 
 int is_builtin(const char* command){
-	return 0;
+	return builtin_id(command) >= 0;
 }
 
 int is_executable(const char* filename){

@@ -4,7 +4,7 @@
 #include "../src/script_handling.h"
 
 void setup(){
-	init_readline();
+	init_readline(NULL);
 	return;
 }
 
