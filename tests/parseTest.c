@@ -18,6 +18,7 @@ void test_generate_argv() {
 	char **args = generate_argv(str);
 	assert_eq_str(*args,"ls");
 	assert_eq_str(*(args+1),"-a");
+	execute_command(args);
 }
 
 void test_generate_argv_with_quotes() {
@@ -44,7 +45,8 @@ void test_generate_argv_with_quotes_and_comment() {
 }
 
 void test_generate_argv_with_non_comment() {
-	char str[] = {  '"',  '"',  'l',  's',  ' ',  'a',  ' ',  'b',  '#',  'a',  'b',  '\0'  };
+	//char str[] = {  '"',  '"',  'l',  's',  ' ',  'a',  ' ',  'b',  '#',  'a',  'b',  '\0'  };
+	char str[] = "\"\"ls a b#ab";
 	char **args = generate_argv(str);
 	assert_eq_str(*args,"ls");
 	assert_eq_str(*(args+1),"a");

@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <err.h>
 #include <stdint.h>
+#include <assert.h>
 
 #include "execute_command.h"
 #include "script_handling.h"
@@ -15,31 +16,29 @@
 // Does not parse or handle redirection stuff, should be handled beforehand.
 // Currently takes a string containing the entire command text, which is parsed into argv.
 // This functionality should probably be moved elsewhere.
-void execute_command(const char* command){
-	char **argv = parse_command(command);
-	#warning CHANGE
-	command = *argv;
-	if(file_exists(command)){
-		if(is_executable(command)){
-			execute_bin(command, argv);
+void execute_command(const char** argv){
+	printf("null\n");
+	if(!argv || !*argv){
+		return;
+	}
+	printf("notnull\n");
+	if(file_exists(argv[0])){
+		if(is_executable(argv[0])){
+			execute_bin(argv[0], argv);
 		}
 		else{
-			execute_shell_script(command, argv);
+			execute_shell_script(argv[0], argv);
 		}
 	}
 	else{
-		if(is_builtin(command)){
-			execute_builtin(command, argv);
+		if(is_builtin(argv[0])){
+			execute_builtin(argv[0], argv);
 		}
 		else{
-			execute_bin(command, argv);
+			printf("bin\n");
+			execute_bin(argv[0], argv);
 		}
 	}
-	char** argv_base = argv;
-	while(*argv){
-		free((*argv++));
-	}
-	free(argv_base);
 }
 
 void execute_builtin(const char* command, const char** argv){
@@ -93,6 +92,7 @@ int is_executable(const char* filename){
 
 int file_exists(const char* filename){
 	FILE* f = fopen(filename, "rb");
+
 	if(!f){
 		return 0;
 	}

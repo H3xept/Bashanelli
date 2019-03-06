@@ -31,14 +31,20 @@ int handle_script(char *filename) {
 	int c = 0;
 	while(c < lines) {
 		if(*scrlines[c]){
-			char* current_line = parse_line(scrlines[c]);
-			execute_command(current_line);
-			free(current_line);			
+			parse_then_execute(scrlines[c]);	
 		}
 		c++;
 	}
 	free(scrlines);
 	return 0;
+}
+
+void parse_then_execute(const char* command) {
+	char* pcom = parse_line(command);
+	char** args = parse_command(pcom);
+	execute_command(args);
+	free(pcom);
+	free(args);		
 }
 
 //reads file line by line and returns malloced char** 

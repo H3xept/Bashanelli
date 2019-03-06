@@ -9,7 +9,7 @@
 
 
 // Executes given string as if it were a command. Currently handles its own argv parsing (move later)
-void execute_command(const char* command);
+void execute_command(const char** command);
 
 // Executes a given command (with args) string as if it were a builtin. (Has a big switch of builtin functions)
 void execute_builtin(const char* command, const char** argv);
