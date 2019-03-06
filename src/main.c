@@ -8,6 +8,7 @@
 #include "startup.h"
 
 #define MAX_CMD_LEN 500
+#define MAX_CWD_LEN 500
 #define K_HOME_ENV "HOME"
 #define K_PATH_ENV "PATH"
 #define K_PS1_ENV "PS1"
@@ -35,8 +36,12 @@ int main(int argc, char const *argv[])
 	int is_done = 0;
 	init_readline(&is_done);
 
+	char* cwd[MAX_CWD_LEN];
 	while(!is_done) {
-		char* line = read_line("Shellerino Diocanarino$ ");
+		getcwd(cwd, MAX_CWD_LEN);
+		char* prompt[MAX_CWD_LEN + 1];
+		sprintf(prompt, "%s>", cwd);
+		char* line = read_line(prompt);
 		execute_command(line);
 	}
 
