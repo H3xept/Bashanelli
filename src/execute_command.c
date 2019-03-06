@@ -18,21 +18,21 @@
 void execute_command(const char* command){
 	char **argv = parse_command(command);
 	#warning CHANGE
-	command = *argv;
-	if(file_exists(command)){
-		if(is_executable(command)){
-			execute_bin(command, argv);
+	char* command_name = *argv;
+	if(is_builtin(command_name)){
+			execute_builtin(command_name, argv);
 		}
-		else{
-			execute_shell_script(command, argv);
-		}
-	}
 	else{
-		if(is_builtin(command)){
-			execute_builtin(command, argv);
+		if(file_exists(command_name)){
+			if(is_executable(command_name)){
+				execute_bin(command_name, argv);
+			}
+			else{
+				execute_shell_script(command_name, argv);
+			}
 		}
 		else{
-			execute_bin(command, argv);
+			execute_bin(command_name, argv);
 		}
 	}
 	char** argv_base = argv;

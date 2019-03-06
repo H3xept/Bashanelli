@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "execute_command.h"
+#include "startup.h"
 
 #define MAX_CMD_LEN 500
 #define K_HOME_ENV "HOME"
@@ -16,7 +17,7 @@ char* read_history() {
 }
 
 int main(int argc, char const *argv[])
-{
+{	
 	char buffer[MAX_CMD_LEN];
 	char* home_directory = getenv(K_HOME_ENV);
 	char* env_path = getenv(K_PATH_ENV);
@@ -30,8 +31,11 @@ int main(int argc, char const *argv[])
 
 	history = read_history();
 
+	startup(argc, argv);
+
+	init_readline();
+
 	while(1) {
-		init_readline();
 		char* line = read_line("Shellerino Diocanarino$ ");
 		execute_command(line);
 	}
