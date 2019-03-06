@@ -19,12 +19,14 @@ int count_occ(const char* str, const char c);
 char* trim_whitespace(const char* str);
 
 char** parse_command(const char *command) {
-
-	char* parsed_command = trim_whitespace(command);
-	ignore_comment(parsed_command);
+	if(!command){
+		return 0;
+	}
 	if(!*command){
 		return 0;
 	}
+	char* parsed_command = trim_whitespace(command);
+	ignore_comment(parsed_command);
 	char* parsed_command_old = parsed_command;
 	parsed_command = parse_line(parsed_command);
 	free(parsed_command_old);

@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "execute_command.h"
-
 #define MAX_CMD_LEN 500
 #define K_HOME_ENV "HOME"
 #define K_PATH_ENV "PATH"
@@ -29,9 +27,9 @@ int main(int argc, char const *argv[])
 	}
 
 	history = read_history();
-
-	while(1) {
-		init_readline();
+	int is_done = 0;
+	while(!is_done) {
+		init_readline(&is_done);
 		char* line = read_line("Shellerino Diocanarino$ ");
 		execute_command(line);
 	}
