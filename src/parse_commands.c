@@ -14,9 +14,7 @@
 #define MAX_ARG_AMT 50
 #define ARG_HAS_QUOTES(x) ((x!=NULL && (strchr(x,'"')!=NULL)))
 
-char *get_arg(char *arg, char **endptr);
-int count_occ(const char* str, const char c);
-char* trim_whitespace(const char* str);
+static char *get_arg(char *arg, char **endptr);
 
 char** parse_command(const char *command) {
 	if(!command){
@@ -109,7 +107,7 @@ char** generate_argv(char* command){
 }
 
 //custom strtok for handling quoted args, ignoring spaces etc.
-char *get_arg(char *arg, char **endptr) {
+static char *get_arg(char *arg, char **endptr) {
 	if (!arg || !*arg){
 		*endptr = NULL;
 		return NULL;
