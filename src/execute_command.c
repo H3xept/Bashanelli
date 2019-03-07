@@ -14,9 +14,6 @@
 #include "parse_commands.h"
 #include "builtins.h"
 
-// Does not parse or handle redirection stuff, should be handled beforehand.
-// Currently takes a string containing the entire command text, which is parsed into argv.
-// This functionality should probably be moved elsewhere.
 void execute_command(const char** argv){
 	if(!argv || !*argv){
 		return;
@@ -36,6 +33,14 @@ void execute_command(const char** argv){
 		else{
 			execute_bin(argv[0], argv);
 		}
+	}
+}
+
+void parse_and_execute_command(const char* command){
+	char **argv = parse_command(command);
+	execute_command(argv);
+	if(argv){
+		free(argv);
 	}
 }
 

@@ -38,34 +38,34 @@ void startup(const int argc, const char** argv){
 	
 	if(first_non_flag_arg > 0){
 		char* cmd = parse_line(argv[first_non_flag_arg]);
-		execute_command(cmd);
+		parse_and_execute_command(cmd);
 		free(cmd);
 	}
 }
 
 static void load_profile_login(){
-	#warning Profile loading disabled.
-	return;
-	execute_command("/etc/profile");
+	//#warning Profile loading disabled.
+	//return;
+	parse_and_execute_command("/etc/profile");
 	char* cmd = parse_line("~/.bash_profile");
-	execute_command(cmd);
+	parse_and_execute_command(cmd);
 	free(cmd);
 	cmd = parse_line("~/.bash_login");
-	execute_command(cmd);
+	parse_and_execute_command(cmd);
 	free(cmd);
 	cmd = parse_line("~/.profile");
-	execute_command(cmd);
+	parse_and_execute_command(cmd);
 	free(cmd);
 	cmd = parse_line("~/.bashrc");
-	execute_command(cmd);
+	parse_and_execute_command(cmd);
 	free(cmd);
 }
 
 static void load_profile_nonlogin(){
-	return;
-	execute_command("/etc/bash.bashrc");
-	exit(0);
+	//return;
+	parse_and_execute_command("/etc/bash.bashrc");
+	//exit(0);
 	char* cmd = parse_line("~/.bashrc");
-	execute_command(cmd);
+	parse_and_execute_command(cmd);
 	free(cmd);
 }
