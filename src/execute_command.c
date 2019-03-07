@@ -17,11 +17,9 @@
 // Currently takes a string containing the entire command text, which is parsed into argv.
 // This functionality should probably be moved elsewhere.
 void execute_command(const char** argv){
-	printf("null\n");
 	if(!argv || !*argv){
 		return;
 	}
-	printf("notnull\n");
 	if(file_exists(argv[0])){
 		if(is_executable(argv[0])){
 			execute_bin(argv[0], argv);
@@ -35,7 +33,6 @@ void execute_command(const char** argv){
 			execute_builtin(argv[0], argv);
 		}
 		else{
-			printf("bin\n");
 			execute_bin(argv[0], argv);
 		}
 	}

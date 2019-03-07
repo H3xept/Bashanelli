@@ -34,18 +34,17 @@ int main(int argc, char const *argv[])
 	while(!is_done) {
 		init_readline(&is_done);
 		char* line = read_line("Shellerino Diocanarino$ ");
-		printf("linebefore: %s\n", line);
 		char** args = parse_command(line);
-		printf("lineafter: %s\n", line);
-		printf("args: %p\n",args );
 		execute_command(args);
-		printf("all ok\n");
-		if(args){
+		if(args && *args){
 			free(args);
 		}
-		free(line);
+		if(line && *line){
+			free(line);
+		}
+
 	}
 
-	printf("Env: %s",home_directory);
+	printf("Env: %s\n",home_directory);
 	return 0;
 }

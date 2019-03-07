@@ -92,7 +92,6 @@ char** generate_argv(char* command){
 	}
 	char *line = calloc(strlen(command) + 1,sizeof(char*));
 	strcpy(line,command);
-	printf("argline: %s\n", line);
 	char *arg;
 	int i = 0;
 	char *nextarg;
@@ -101,13 +100,11 @@ char** generate_argv(char* command){
 	while(arg != NULL) {
 		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
 		strcpy(*(argv + i), arg);
-		printf("arg %i: %s\n", i, *(argv + i));
 		arg = get_arg(nextarg,&nextarg);
 	 	i++;
 	}
 	*(argv + i) = NULL;
 	realloc(argv,(i+1)*sizeof(char*));
-	printf("argv ok\n");
 	return argv;
 }
 
