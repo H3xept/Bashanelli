@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "builtins.h"
 
 
 static void builtin_cd(const char** argv);
+static void builtin_export(const char **argv);
 
-static char* builtins_list[] = {"cd"};
+static char* builtins_list[] = {"cd", "export"};
 
 int builtin_id(const char* command){
 	for(int i = 0; i < NUM_BUILTINS; i++){
@@ -32,5 +34,14 @@ void exec_builtin_id(const int id, const char** argv){
 }
 
 static void builtin_cd(const char** argv){
-	chdir(*(argv + 1));
+	if(!*(argv + 1)){
+		chdir(getenv("HOME"));
+	}
+	else if(chdir(*(argv + 1))) {
+		warn("cd: %s", *(argv + 1));
+	}
+}
+
+static void builtin_export(const char **argv){
+	return;
 }
