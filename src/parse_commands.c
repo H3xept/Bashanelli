@@ -19,12 +19,14 @@ int count_occ(const char* str, const char c);
 char* trim_whitespace(const char* str);
 
 char** parse_command(const char *command) {
-
-	char* parsed_command = trim_whitespace(command);
-	ignore_comment(parsed_command);
+	if(!command){
+		return 0;
+	}
 	if(!*command){
 		return 0;
 	}
+	char* parsed_command = trim_whitespace(command);
+	ignore_comment(parsed_command);
 	char* parsed_command_old = parsed_command;
 	parsed_command = parse_line(parsed_command);
 	free(parsed_command_old);
@@ -51,22 +53,58 @@ char **seperate_into_commands(const char *command) {
 	return argv;
 }
 
+int count_occ(const char* str, const char c){
+	int occurences = 0;
+	for(int i = 0; i < strlen(str); i++){
+		occurences += *(str + i) == c;
+	}
+	return occurences;
+}
+
+char* trim_whitespace(const char* str){
+	char* ret = str;
+	while(*ret == ' ' || *ret == '\n'){
+		ret++;
+	}
+	while(*(ret + strlen(ret) - 1) == ' ' || *(ret + strlen(ret) - 1) == '\n'){
+		*(ret + strlen(ret) - 1) = '\0';
+	}
+	char* ret_allocated = calloc(strlen(ret) + 1, sizeof(char));
+	strcpy(ret_allocated, ret);
+	return ret_allocated;
+}
+
+void ignore_comment(char *line) {
+	if (*line == '#'){
+		free(line);
+	}
+
+	char *comment = strchr(line,'#'); 
+	if (comment && *(comment-1) == ' '){
+		*(comment-1) = '\0';
+		realloc(line, strlen(line)*sizeof(char));
+	}
+}
+
 char** generate_argv(char* command){
-	if(!*command){
+	if(!command || !*command){
 	 	return NULL;
 	}
-	// //int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
+	char *line = calloc(strlen(command) + 1,sizeof(char*));
+	strcpy(line,command);
 	char *arg;
 	int i = 0;
 	char *nextarg;
 	char** argv = calloc(MAX_ARG_AMT, sizeof(char*));
-	arg = get_arg(command,&nextarg);
+	arg = get_arg(line,&nextarg);
 	while(arg != NULL) {
-	 	*(argv + i) = arg;
+		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
+		strcpy(*(argv + i), arg);
 		arg = get_arg(nextarg,&nextarg);
 	 	i++;
 	}
 	*(argv + i) = NULL;
+	realloc(argv,(i+1)*sizeof(char*));
 	return argv;
 }
 
@@ -118,36 +156,4 @@ char *get_arg(char *arg, char **endptr) {
 	}
 	*endptr = (arg + i);
 	return ret; 
-}
-
-int count_occ(const char* str, const char c){
-	int occurences = 0;
-	for(int i = 0; i < strlen(str); i++){
-		occurences += *(str + i) == c;
-	}
-	return occurences;
-}
-
-char* trim_whitespace(const char* str){
-	char* ret = str;
-	while(*ret == ' ' || *ret == '\n'){
-		ret++;
-	}
-	while(*(ret + strlen(ret) - 1) == ' ' || *(ret + strlen(ret) - 1) == '\n'){
-		*(ret + strlen(ret) - 1) = '\0';
-	}
-	char* ret_allocated = calloc(strlen(ret) + 1, sizeof(char));
-	strcpy(ret_allocated, ret);
-	return ret_allocated;
-}
-
-void ignore_comment(char *line) {
-	if (*line == '#'){
-		*line = '\0';
-	}
-
-	char *comment = strchr(line,'#'); 
-	if (comment && *(comment-1) == ' '){
-		*(comment-1) = '\0';
-	}
 }

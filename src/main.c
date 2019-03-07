@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "parse_commands.h"
 #include "execute_command.h"
 #include "startup.h"
 
@@ -42,9 +43,16 @@ int main(int argc, char const *argv[])
 		char* prompt[MAX_CWD_LEN + 1];
 		sprintf(prompt, "%s>", cwd);
 		char* line = read_line(prompt);
-		execute_command(line);
+		char** args = parse_command(line);
+		execute_command(args);
+		if(args && *args){
+			free(args);
+		}
+		if(line && *line){
+			free(line);
+		}
 	}
 
-	printf("Env: %s",home_directory);
+	printf("Env: %s\n",home_directory);
 	return 0;
 }

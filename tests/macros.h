@@ -79,6 +79,12 @@
 }
 
 #define assert_eq_str(S1, S2) {\
+	if ((S1) == NULL || (S2) == NULL) {\
+		__explanation_separator();	\
+		printf("One of the passed strings is NULL!\n");\
+		__explanation_separator();	\
+		exit(-1);\
+	} else\
 	if (strcmp(S1,S2)) {\
 		__explanation_separator();\
 		printf("Expected %s | got %s \n",S1,S2);\
