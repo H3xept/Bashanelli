@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include <stdarg.h>
 
+#include "aliasing.h"
+
 static struct aliaslist *generate_alias_item(const char *command, const char *alias);
 static struct aliaslist *is_alias(const char *alias);
 
@@ -50,7 +52,99 @@ void add_alias(const char *alias, const char *command) {
 		strcpy(existing->com, command);
 		free(new);
 	}
+}
 
+int remove_alias(const char *alias) {
+	if (length == 0) {
+		return 1;
+	}
+	struct aliaslist *current = tail;
+	if(!strcmp(current->ali, alias)){
+		tail = current->next;
+		free(current);
+		length--;
+		return 0;
+	}
+	while(current->next) {
+		if(!strcmp(current->next->ali,alias)){
+			struct aliaslist *temp = current->next->next;
+			free(current->next);
+			current->next = temp;
+			length--;
+			return 0;
+		}
+		current = current->next;
+	}
+	return 1;
+}
+
+void print_aliaslist(){
+	if(!tail){
+		printf("\n");
+	}
+	struct aliaslist *current = tail;
+	while(current){
+		printf("alias %s = '%s'\n",current->ali,current->com);
+		current = current->next;
+	}
+}
+
+int print_alias(const char *alias) {
+	char *command = expand_alias(alias);
+	if(command){
+		printf("alias %s=\'%s\'\n", alias, command);
+		free(command);
+		return 0;
+	}
+	else {
+		return 1;
+	}
+}
+
+char *expand_alias(char *alias) {
+	if(!alias || !*alias){
+		return NULL;
+	}
+	char *track = calloc(strlen(alias)+2, sizeof(char));
+	strcpy(track,alias);
+	strcat(track, "#");
+
+	struct aliaslist *current = is_alias(alias);
+	while(current) {
+		if (!strstr(track, current->com)) {
+			printf("ontrack\n");
+			track = realloc(track,(strlen(track)+strlen(current->com)+2)*sizeof(char));
+			strcat(track,current->com);
+			strcat(track,"#");
+		}
+		else {
+			printf("%s\n", );
+			free(track);
+			char *ret = calloc(strlen(current->ali)+1,sizeof(char));
+			strcpy(ret, current->com);
+			free(current);
+			return ret;
+		}
+		current = is_alias(current->com);
+	}
+	free(track);
+	return NULL;
+}
+
+void teardown_aliases() {
+	if (length == 0) {
+		return;
+	}
+	struct aliaslist *current = tail;
+	while(current) {
+			struct aliaslist *temp = current->next;
+			free(current);
+			current = temp;
+			length--;
+	}
+	head = NULL;
+	tail = NULL;
+	return;
 }
 
 static struct aliaslist *generate_alias_item(const char *command, const char *alias) {
@@ -74,13 +168,4 @@ static struct aliaslist *is_alias(const char *alias){
 		current = current->next;
 	}
 	return NULL;
-}
-
-
-void print_aliaslist(){
-	struct aliaslist *current = tail;
-	while(current){
-		printf("alias %s = '%s'\n",current->ali,current->com);
-		current = current->next;
-	}
 }

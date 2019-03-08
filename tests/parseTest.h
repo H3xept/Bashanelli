@@ -13,6 +13,9 @@ void test_generate_argv_backslash_spaces();
 void test_generate_argv_another_backslash_escape();
 void test_file_exists();
 void test_trim_outside_whitespace();
+void test_parse_nulls1();
+void test_parse_nulls2();
+void test_parse_nulls3();
 void teardown();
 
 #endif

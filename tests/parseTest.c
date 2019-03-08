@@ -18,7 +18,6 @@ void test_generate_argv() {
 	char **args = generate_argv(str);
 	assert_eq_str(*args,"ls");
 	assert_eq_str(*(args+1),"-a");
-	execute_command(args);
 }
 
 void test_generate_argv_with_quotes() {
@@ -85,6 +84,21 @@ void test_trim_outside_whitespace() {
 	char str1[] = "     some words    ";
 	char *str2 = trim_whitespace(str1);
 	assert_eq_str(str2,"some words");
+}
+
+void test_parse_nulls1() {
+	char *str1;
+	parse_command(str1);
+}
+
+void test_parse_nulls2() {
+	char str2[] = "";
+	parse_command(str2);
+}
+
+void test_parse_nulls3() {
+	char str3[] = "#";
+	parse_command(str3);
 }
 
 void teardown(){

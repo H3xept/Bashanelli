@@ -27,8 +27,9 @@ char** parse_command(const char *command) {
 	ignore_comment(parsed_command);
 	char* parsed_command_old = parsed_command;
 	parsed_command = parse_line(parsed_command);
-	free(parsed_command_old);
-
+	if(parsed_command_old){
+		free(parsed_command_old);
+	}
 	char** argv = generate_argv(parsed_command);
 	free(parsed_command);
 	return argv;
@@ -60,6 +61,9 @@ int count_occ(const char* str, const char c){
 }
 
 char* trim_whitespace(const char* str){
+	if(!str){
+		return NULL;
+	}
 	char* ret = str;
 	while(*ret == ' ' || *ret == '\n'){
 		ret++;
@@ -73,10 +77,12 @@ char* trim_whitespace(const char* str){
 }
 
 void ignore_comment(char *line) {
+	if(!line || !*line){
+		return NULL;
+	}
 	if (*line == '#'){
 		free(line);
 	}
-
 	char *comment = strchr(line,'#'); 
 	if (comment && *(comment-1) == ' '){
 		*(comment-1) = '\0';
