@@ -90,10 +90,13 @@ void print_aliaslist(){
 }
 
 int print_alias(const char *alias) {
-	char *command = expand_alias(alias);
+	struct aliaslist *tmp = is_alias(alias);
+	char *command = NULL;
+	if(tmp){
+		command = tmp->com;		
+	}
 	if(command){
 		printf("alias %s = '%s'\n", alias, command);
-		free(command);
 		return 0;
 	}
 	else {
