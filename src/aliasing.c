@@ -90,7 +90,7 @@ void print_aliaslist(){
 }
 
 int print_alias(const char *alias) {
-	char *command = ;
+	char *command = expand_alias(alias);
 	if(command){
 		printf("alias %s = '%s'\n", alias, command);
 		free(command);
