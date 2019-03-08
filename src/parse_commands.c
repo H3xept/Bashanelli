@@ -35,22 +35,22 @@ char** parse_command(const char *command) {
 	return argv;
 }
 
-char **seperate_into_commands(const char *command) {
-		if(!*command){
-		return NULL;
-	}
-	int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
-	char** argv = calloc(argc + 1, sizeof(char*));
-	char* arg = strtok(command, " ");
-	for(int i = 0; i < argc; i++){
-		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
-		strcpy(*(argv + i), arg);
-		arg = strtok(NULL, " ");
-	}
-	*(argv + argc) = NULL;
-	int i = 1;
-	return argv;
-}
+// char **seperate_into_commands(const char *command) {
+// 		if(!*command){
+// 		return NULL;
+// 	}
+// 	int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
+// 	char** argv = calloc(argc + 1, sizeof(char*));
+// 	char* arg = strtok(command, " ");
+// 	for(int i = 0; i < argc; i++){
+// 		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
+// 		strcpy(*(argv + i), arg);
+// 		arg = strtok(NULL, " ");
+// 	}
+// 	*(argv + argc) = NULL;
+// 	int i = 1;
+// 	return argv;
+// }
 
 int count_occ(const char* str, const char c){
 	int occurences = 0;

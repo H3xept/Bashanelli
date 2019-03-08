@@ -6,7 +6,7 @@ char** parse_command(const char *command);
 
 //input full line of commands and pipeline/redirection symbols
 //UNIMPLEMENTED
-char **seperate_into_commands(const char *command);
+//char **seperate_into_commands(const char *command);
 
 //gets alloced tokens from line without trimming whitespace or ignoring comments
 char** generate_argv(char* command);

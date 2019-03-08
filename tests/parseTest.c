@@ -74,6 +74,15 @@ void test_generate_argv_another_backslash_escape() {
 	assert_eq_str(*(args+1),"b");
 }
 
+void test_generate_argv_multiple_escaped_spaces() {
+	char str[] = "\\ \\ ";
+	char **args = generate_argv(str);
+	assert_eq_str(*args,"  ");
+	free(args);
+	char **args = parse_command(str);
+	assert_eq_str(*args,"  ");
+}
+
 void test_file_exists() {
 	FILE *fp = fopen("loltest","w");
 	assert_true(file_exists("loltest"));

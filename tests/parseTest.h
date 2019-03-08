@@ -11,6 +11,7 @@ void test_generate_argv_with_non_comment();
 void test_generate_argv_one_quoted_arg();
 void test_generate_argv_backslash_spaces();
 void test_generate_argv_another_backslash_escape();
+void test_generate_argv_multiple_escaped_spaces();
 void test_file_exists();
 void test_trim_outside_whitespace();
 void test_parse_nulls1();

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <err.h>
 
 #include "builtins.h"
 #include "aliasing.h"
@@ -79,7 +80,7 @@ static void builtin_alias(const char **argv){
 		}
 		else {
 			if(print_alias(p)) {
-				warnx("alias: %s: was not found :(", p);
+				warnx("alias: %s: was not found", p);
 			}
 		}
 		i++;
@@ -89,5 +90,23 @@ static void builtin_alias(const char **argv){
 }
 
 static void builtin_unalias(const char **argv){
+if(!*(argv+1)){
+		warnx("unalias: usage: unalias [-a] name [name ...]\n");
+		return;
+	}
+	int i = 1;
+	if(!strcmp(*(argv+i),"-a")){
+		teardown_aliases();
+		init_aliases();
+		return;
+	}
+	char *p = *(argv+i);
+	while(p){
+		if(remove_alias(p)) {
+			warnx("alias: %s: was not found", p);
+		}
+		i++;
+		p = *(argv+i);
+	}
 	return;
 }
