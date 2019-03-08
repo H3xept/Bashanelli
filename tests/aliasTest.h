@@ -9,6 +9,7 @@ void test_remove_alias();
 void test_remove_non_existing();
 void test_add_remove_alias();
 void test_teardown_aliases();
+void test_expanding_aliases();
 void teardown();
 
 #endif

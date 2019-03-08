@@ -73,6 +73,13 @@ void test_teardown_aliases() {
 	assert_eq_int(0,get_aliaslist_length());
 }
 
+void test_expanding_aliases(){
+	add_alias("aa","bee");
+	add_alias("cea","diii");
+	char *a1 = expand_alias("aa");
+	char *a2 = expand_alias("aa");
+}
+
 void teardown(){
 	return;
 }

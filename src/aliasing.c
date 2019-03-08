@@ -90,9 +90,9 @@ void print_aliaslist(){
 }
 
 int print_alias(const char *alias) {
-	char *command = expand_alias(alias);
+	char *command = ;
 	if(command){
-		printf("alias %s=\'%s\'\n", alias, command);
+		printf("alias %s = '%s'\n", alias, command);
 		free(command);
 		return 0;
 	}
@@ -105,30 +105,31 @@ char *expand_alias(char *alias) {
 	if(!alias || !*alias){
 		return NULL;
 	}
-	char *track = calloc(strlen(alias)+2, sizeof(char));
-	strcpy(track,alias);
-	strcat(track, "#");
-
+	char *track = calloc(2,sizeof(char));
+	strcpy(track, "#");
+	char *ret = NULL;
 	struct aliaslist *current = is_alias(alias);
 	while(current) {
-		if (!strstr(track, current->com)) {
-			printf("ontrack\n");
-			track = realloc(track,(strlen(track)+strlen(current->com)+2)*sizeof(char));
-			strcat(track,current->com);
-			strcat(track,"#");
+		if (track && strstr(track, current->ali)) {
+			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
+			strcpy(ret, current->ali);
+			return ret;
 		}
 		else {
-			printf("%s\n", );
-			free(track);
-			char *ret = calloc(strlen(current->ali)+1,sizeof(char));
+			int l = (track) ? strlen(track) : 0;  
+			track = realloc(track,(l+strlen(current->ali)+2)*sizeof(char));
+			strcat(track,current->ali);
+			strcat(track,"#");
+			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
 			strcpy(ret, current->com);
-			free(current);
-			return ret;
 		}
 		current = is_alias(current->com);
 	}
-	free(track);
-	return NULL;
+	if (track) {
+		free(track);		
+	}
+
+	return ret;
 }
 
 void teardown_aliases() {
@@ -160,6 +161,10 @@ static struct aliaslist *generate_alias_item(const char *command, const char *al
 }
 
 static struct aliaslist *is_alias(const char *alias){
+	if(!alias){
+		printf("nullboi\n");
+		return NULL;
+	}
 	struct aliaslist *current = tail;
 	while(current){
 		if (!strcmp(current->ali,alias)){
