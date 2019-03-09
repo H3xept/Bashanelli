@@ -6,7 +6,7 @@
 
 #include "builtins.h"
 #include "aliasing.h"
-
+#include "exporting.h"
 
 static void builtin_cd(const char** argv);
 static void builtin_export(const char **argv);
@@ -57,6 +57,27 @@ static void builtin_cd(const char** argv){
 }
 
 static void builtin_export(const char **argv){
+	if(!*(argv+1)){
+		print_exportlist();
+		return;
+	}
+	int i = 1;
+	if(!strcmp(*(argv+i),"-p")){
+		print_aliaslist();
+		i++;
+	}
+	char *p = *(argv+i);
+	while(p){
+		char *ep = strchr(p, '=');
+		if(ep) {
+			char *tmp = calloc(strlen(p) - strlen(ep) + 1,sizeof(char));
+			strncpy(tmp, p, strlen(p) - strlen(ep));
+			add_export(tmp, ep+1);
+			free(tmp);
+		}
+		i++;
+		p = *(argv+i);
+	}
 	return;
 }
 

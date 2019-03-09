@@ -30,7 +30,6 @@ int handle_script(const char *filename) {
 
 	int c = 0;
 	while(c < lines) {
-		printf("pandE\n");
 		if(*scrlines[c]){
 			parse_and_execute_command(scrlines[c]);	
 		}
@@ -38,19 +37,15 @@ int handle_script(const char *filename) {
 	}
 	int i = 0;
 	while(scrlines[i]){
-		printf("freeing lines\n");
 		free(scrlines[i]);
 		i++;
 	}
 	if(scrlines){
-		printf("freeing linearray\n");
 		free(scrlines);
 	}
 	return 0;
 }
 
-//reads file line by line and returns malloced char** 
-//if (line count) *lcount < actual number of lines in the file then *lcount is increased accordingly
 char **read_file(const char* filepath, unsigned int *lcount) {
 	
 	*lcount = DEFAULT_LINES; //default size, IK magic numbers are probably bad but whatever, it stops uninitialised and 0 lcount from breaking it.
@@ -86,14 +81,11 @@ char **read_file(const char* filepath, unsigned int *lcount) {
 	return lines;
 }
 
-//searches the PATH env variable for the filename
-//returns the full path to that file if present in PATH,
-//otherwise returns 0/NULL
 char *search_path(const char* filename) {
 
 	FILE *fp;
 	char *path, *ret, *tempath;
-	path = malloc(strlen(getenv("PATH"))*sizeof(char)+1);
+	path = malloc((strlen(getenv("PATH"))+1)*sizeof(char));
 	strcpy(path,getenv("PATH"));
 
 	if(!path)
@@ -114,5 +106,19 @@ char *search_path(const char* filename) {
 		tempath = strtok(NULL,":");
 	}
 	free(path);
+	return 0;
+}
+
+int is_script(const char *path){
+	if(file_exists){
+		FILE *fp = fopen(path, "r");
+		char shebang[MAX_CMD_LEN] = {0};
+		fgets(shebang, MAX_CMD_LEN, fp);
+		REMOVE_NEWLINE(shebang)
+		if(shebang && shebang[0] == '#' && shebang[1] == '!'){
+			parse_and_execute_command(shebang+2);
+			return 1;
+		}
+	}
 	return 0;
 }

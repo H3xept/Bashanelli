@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "exporting.h"
+#include "aliasing.h"
 #include "parse_commands.h"
 #include "execute_command.h"
 #include "startup.h"
@@ -32,6 +34,8 @@ int main(int argc, char const *argv[])
 	}
 
 	history = read_history();
+	init_aliases();
+	init_exports();
 
 	startup(argc, argv);
 	int is_done = 0;
@@ -43,7 +47,6 @@ int main(int argc, char const *argv[])
 		char* prompt[MAX_CWD_LEN + 1];
 		sprintf(prompt, "%s>", cwd);
 		char* line = read_line(prompt);
-		printf("readline ok\n");
 		char** args = parse_command(line);
 		execute_command(args);
 		if(args && *args){

@@ -25,7 +25,7 @@ void print_aliaslist();
 //prints alias a = 'b'
 int print_alias(const char *alias);
 
-//gets the eventual value of an alias after recursing
+//gets the true value of an alias after recursing
 //(terminates if loop detected)
 //e.g. given 'a=b' 'b=c' 'c=a'
 //when input alias is 'a', return would be 'a'

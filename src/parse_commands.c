@@ -25,14 +25,25 @@ char** parse_command(const char *command) {
 	if(cmd_whitespace){
 		free(cmd_whitespace);
 	}
-	char* parsed_command = parse_line(uncommented);
-	if(uncommented) {
-		free(uncommented);
+	#warning TEMPORARY FIX FOR PARSE_LINE NOT LIKING NULL
+	char** argv;
+	if (uncommented){
+		char* parsed_command = parse_line(uncommented);
+		if(uncommented) {
+			free(uncommented);
+		}
+		argv = generate_argv(parsed_command);
+		if(parsed_command){
+			free(parsed_command);	
+		}
 	}
-	char** argv = generate_argv(parsed_command);
-	if(parsed_command){
-		free(parsed_command);	
+	else{
+		argv = generate_argv(uncommented);
+		if(uncommented){
+			free(uncommented);	
+		}
 	}
+
 	return argv;
 }
 
