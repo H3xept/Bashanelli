@@ -12,7 +12,7 @@ char** parse_command(const char *command);
 char** generate_argv(char* command);
 
 //returns alloced line stripping anything after and including #
-char *ignore_comment(char *line);
+char *ignore_comment(const char *line);
 
 //returns number of occurences of char c in str.
 int count_occ(const char* str, const char c);

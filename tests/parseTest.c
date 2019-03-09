@@ -87,13 +87,31 @@ void test_file_exists() {
 }
 
 void test_trim_outside_whitespace() {
-	char str1[] = "     some words    ";
+	char str1[] = " some words    ";
 	char *str2 = trim_whitespace(str1);
 	assert_eq_str(str2,"some words");
 }
 
+void test_trim_trailing_whitespace() {
+	char str1[] = "some words    ";
+	char *str2 = trim_whitespace(str1);
+	assert_eq_str(str2,"some words");
+}
+
+void test_trim_leading_whitespace() {
+	char str1[] = "   some words";
+	char *str2 = trim_whitespace(str1);
+	assert_eq_str(str2,"some words");
+}
+
+void test_trim_only_whitespace() {
+	char str1[] = "       ";
+	char *str2 = trim_whitespace(str1);
+	assert_true(!str2);
+}
+
 void test_parse_nulls1() {
-	char *str1;
+	char *str1 = 0;
 	parse_command(str1);
 }
 

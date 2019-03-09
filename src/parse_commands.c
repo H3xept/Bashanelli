@@ -7,36 +7,32 @@
 #include <sys/wait.h>
 #include <err.h>
 #include <stdint.h>
+#include <assert.h>
 
 #include "parse_commands.h"
 
 #define MAX_CMD_LEN 500
 #define MAX_ARG_AMT 50
-#define ARG_HAS_QUOTES(x) ((x!=NULL && (strchr(x,'"')!=NULL)))
 
 static char *get_arg(char *arg, char **endptr);
 
 char** parse_command(const char *command) {
-	if(!command){
+	if(!command || !*command){
 		return 0;
 	}
-	if(!*command){
-		return 0;
+	char* cmd_whitespace = trim_whitespace(command);
+	char *uncommented = ignore_comment(cmd_whitespace);
+	if(cmd_whitespace){
+		free(cmd_whitespace);
 	}
-	char* pre_parsed_command = trim_whitespace(command);
-	char *parsed_command = ignore_comment(pre_parsed_command);
-	if(pre_parsed_command){
-		free(pre_parsed_command);
-	}
-	char* parsed_command_old = parsed_command;
-	if(parsed_command) {
-		parsed_command = parse_line(parsed_command);
-	}
-	if(parsed_command_old){
-		free(parsed_command_old);
+	char* parsed_command = parse_line(uncommented);
+	if(uncommented) {
+		free(uncommented);
 	}
 	char** argv = generate_argv(parsed_command);
-	free(parsed_command);
+	if(parsed_command){
+		free(parsed_command);	
+	}
 	return argv;
 }
 
@@ -66,22 +62,36 @@ int count_occ(const char* str, const char c){
 }
 
 char* trim_whitespace(const char* str){
-	if(!str){
+	if(!str || !*str){
 		return NULL;
 	}
 	char* ret = str;
+	char* end = str + strlen(str)-1;
 	while(*ret == ' ' || *ret == '\n'){
 		ret++;
 	}
-	while(*(ret + strlen(ret) - 1) == ' ' || *(ret + strlen(ret) - 1) == '\n'){
-		*(ret + strlen(ret) - 1) = '\0';
+	while((*(end) == ' ' || *(end) == '\n') && end >= ret){
+		end--;
 	}
-	char* ret_allocated = calloc(strlen(ret) + 1, sizeof(char));
-	strcpy(ret_allocated, ret);
-	return ret_allocated;
+	if(ret > end){
+		return NULL;
+	}
+	else if (ret == end) {
+		char* ret_allocated = calloc(strlen(str)+1, sizeof(char));
+		strcpy(ret_allocated, str);
+		return ret_allocated;
+	}
+	else {
+		assert(end-ret);
+		char* ret_allocated = calloc((end - ret) + 2, sizeof(char));
+		strncpy(ret_allocated, ret, (end - ret)+1);
+		assert(ret_allocated);
+		return ret_allocated;
+	}
+
 }
 
-char *ignore_comment(char *line) {
+char *ignore_comment(const char *line) {
 	if(!line || !*line){
 		return NULL;
 	}
@@ -92,6 +102,7 @@ char *ignore_comment(char *line) {
 	char *ret = calloc(strlen(line)+1, sizeof(char));
 	strcpy(ret, line); 
 	if (comment && *(comment-1) == ' ') {
+		assert(strlen(line)-strlen(comment) > 0);
 		realloc(ret, (strlen(line)-strlen(comment))*sizeof(char));
 		*(ret+(strlen(line)-strlen(comment))) = '\0';
 	}

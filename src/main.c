@@ -43,6 +43,7 @@ int main(int argc, char const *argv[])
 		char* prompt[MAX_CWD_LEN + 1];
 		sprintf(prompt, "%s>", cwd);
 		char* line = read_line(prompt);
+		printf("readline ok\n");
 		char** args = parse_command(line);
 		execute_command(args);
 		if(args && *args){
