@@ -11,6 +11,7 @@
 
 static struct aliaslist *generate_alias_item(const char *command, const char *alias);
 static struct aliaslist *is_alias(const char *alias);
+static int srec(const char **hist, char *alias);
 
 struct aliaslist{
 	char *com;
@@ -104,32 +105,34 @@ int print_alias(const char *alias) {
 	}
 }
 
+
 char *expand_alias(char *alias) {
 	if(!alias || !*alias){
 		return NULL;
 	}
-	char *track = calloc(2,sizeof(char));
-	strcpy(track, "#");
+	char **hist = calloc(1,sizeof(char*));
+	int r = 0;
 	char *ret = NULL;
 	struct aliaslist *current = is_alias(alias);
 	while(current) {
-		if (track && strstr(track, current->ali)) {
+		if (srec(hist, current->ali)) {//checknull
 			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
 			strcpy(ret, current->ali);
 			return ret;
 		}
 		else {
-			int l = (track) ? strlen(track) : 0;  
-			track = realloc(track,(l+strlen(current->ali)+2)*sizeof(char));
-			strcat(track,current->ali);
-			strcat(track,"#");
+			*(hist+r) = calloc(strlen(current->ali)+1,sizeof(char)); 
+			strcpy(*(hist+r),current->ali);
+			r++;
+			hist = realloc(hist, r*sizeof(char*));
+			*(hist+r) = NULL;
 			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
 			strcpy(ret, current->com);
 		}
 		current = is_alias(current->com);
 	}
-	if (track) {
-		free(track);		
+	if (hist) {
+		free(hist);		
 	}
 
 	return ret;
@@ -176,4 +179,14 @@ static struct aliaslist *is_alias(const char *alias){
 		current = current->next;
 	}
 	return NULL;
+}
+
+static int srec(const char **hist, char *alias){
+	int i = 0;
+	while(*(hist+i)) {
+		if(!strcmp(*(hist+i),alias)){
+			return 1;
+		}
+	}
+	return 0;
 }

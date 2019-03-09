@@ -23,7 +23,10 @@ char** parse_command(const char *command) {
 	if(!*command){
 		return 0;
 	}
-	char* parsed_command = trim_whitespace(command);
+	//problem with \space at end of line?
+	//char* parsed_command = trim_whitespace(command);
+	char *parsed_command = calloc(strlen(command)+1,sizeof(char));
+	strcpy(parsed_command,command);
 	ignore_comment(parsed_command);
 	char* parsed_command_old = parsed_command;
 	parsed_command = parse_line(parsed_command);

@@ -78,9 +78,6 @@ void test_generate_argv_multiple_escaped_spaces() {
 	char str[] = "\\ \\ ";
 	char **args = generate_argv(str);
 	assert_eq_str(*args,"  ");
-	free(args);
-	char **args = parse_command(str);
-	assert_eq_str(*args,"  ");
 }
 
 void test_file_exists() {
