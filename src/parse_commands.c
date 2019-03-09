@@ -23,13 +23,15 @@ char** parse_command(const char *command) {
 	if(!*command){
 		return 0;
 	}
-	//problem with \space at end of line?
-	//char* parsed_command = trim_whitespace(command);
-	char *parsed_command = calloc(strlen(command)+1,sizeof(char));
-	strcpy(parsed_command,command);
-	ignore_comment(parsed_command);
+	char* pre_parsed_command = trim_whitespace(command);
+	char *parsed_command = ignore_comment(pre_parsed_command);
+	if(pre_parsed_command){
+		free(pre_parsed_command);
+	}
 	char* parsed_command_old = parsed_command;
-	parsed_command = parse_line(parsed_command);
+	if(parsed_command) {
+		parsed_command = parse_line(parsed_command);
+	}
 	if(parsed_command_old){
 		free(parsed_command_old);
 	}
@@ -79,18 +81,21 @@ char* trim_whitespace(const char* str){
 	return ret_allocated;
 }
 
-void ignore_comment(char *line) {
+char *ignore_comment(char *line) {
 	if(!line || !*line){
 		return NULL;
 	}
 	if (*line == '#'){
-		free(line);
+		return NULL;
 	}
-	char *comment = strchr(line,'#'); 
-	if (comment && *(comment-1) == ' '){
-		*(comment-1) = '\0';
-		realloc(line, strlen(line)*sizeof(char));
+	char *comment = strchr(line,'#');
+	char *ret = calloc(strlen(line)+1, sizeof(char));
+	strcpy(ret, line); 
+	if (comment && *(comment-1) == ' ') {
+		realloc(ret, (strlen(line)-strlen(comment))*sizeof(char));
+		*(ret+(strlen(line)-strlen(comment))) = '\0';
 	}
+	return ret;
 }
 
 char** generate_argv(char* command){
@@ -156,8 +161,10 @@ static char *get_arg(char *arg, char **endptr) {
 		}
 		i++;
 	}
-	char *ret = calloc(c,sizeof(char));
-	strcpy(ret,temp);
+	char *ret = (!c) ? NULL : calloc(c,sizeof(char));
+	if(ret){
+		strcpy(ret,temp);
+	}
 	while(arg[i] == ' ') {
 		i++;
 	}

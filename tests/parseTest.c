@@ -107,6 +107,11 @@ void test_parse_nulls3() {
 	parse_command(str3);
 }
 
+void test_generate_argv_null(){
+	char *str3 = NULL;
+	generate_argv(str3);
+}
+
 void teardown(){
 	return;
 }

@@ -11,8 +11,8 @@ char** parse_command(const char *command);
 //gets alloced tokens from line without trimming whitespace or ignoring comments
 char** generate_argv(char* command);
 
-//reallocs line to strip anthing after #
-void ignore_comment(char *line);
+//returns alloced line stripping anything after and including #
+char *ignore_comment(char *line);
 
 //returns number of occurences of char c in str.
 int count_occ(const char* str, const char c);

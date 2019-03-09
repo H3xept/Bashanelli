@@ -43,8 +43,12 @@ void parse_then_execute(const char* command) {
 	char* pcom = parse_line(command);
 	char** args = parse_command(pcom);
 	execute_command(args);
-	free(pcom);
-	free(args);		
+	if(pcom){
+		free(pcom);		
+	}
+	if(args){
+		free(args);			
+	}
 }
 
 //reads file line by line and returns malloced char** 

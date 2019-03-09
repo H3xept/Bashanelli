@@ -17,6 +17,7 @@ void test_trim_outside_whitespace();
 void test_parse_nulls1();
 void test_parse_nulls2();
 void test_parse_nulls3();
+void test_generate_argv_null();
 void teardown();
 
 #endif
