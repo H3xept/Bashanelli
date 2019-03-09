@@ -29,7 +29,7 @@ int print_alias(const char *alias);
 //(terminates if loop detected)
 //e.g. given 'a=b' 'b=c' 'c=a'
 //when input alias is 'a', return would be 'a'
-char *expand_alias(char *alias);
+char *resolve_alias(char *alias);
 
 //clear and free all aliases
 void teardown_aliases();

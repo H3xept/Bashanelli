@@ -1,4 +1,4 @@
-#include <ANSIsACurse/cursor.h>
+//#include <ANSIsACurse/cursor.h>
 #include <BareBonesReadline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -103,7 +103,7 @@ char *ignore_comment(const char *line) {
 	strcpy(ret, line); 
 	if (comment && *(comment-1) == ' ') {
 		assert(strlen(line)-strlen(comment) > 0);
-		realloc(ret, (strlen(line)-strlen(comment))*sizeof(char));
+		ret = realloc(ret, (strlen(line)-strlen(comment))*sizeof(char));
 		*(ret+(strlen(line)-strlen(comment))) = '\0';
 	}
 	return ret;
@@ -127,7 +127,7 @@ char** generate_argv(char* command){
 	 	i++;
 	}
 	*(argv + i) = NULL;
-	realloc(argv,(i+1)*sizeof(char*));
+	argv = realloc(argv,(i+1)*sizeof(char*));
 	return argv;
 }
 

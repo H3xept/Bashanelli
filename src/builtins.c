@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <err.h>
+#include <unistd.h>
 
 #include "builtins.h"
 #include "aliasing.h"

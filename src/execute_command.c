@@ -39,7 +39,14 @@ void execute_command(const char** argv){
 void parse_and_execute_command(const char* command){
 	char **argv = parse_command(command);
 	execute_command(argv);
-	if(argv){
+	if(argv ){
+		int i = 0;
+		while(*(argv+i)) {
+			printf("freeing argv+i\n");
+			free(*(argv+i));
+			i++;
+		}
+		printf("freeing argv\n");
 		free(argv);
 	}
 }

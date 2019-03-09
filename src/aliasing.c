@@ -11,7 +11,7 @@
 
 static struct aliaslist *generate_alias_item(const char *command, const char *alias);
 static struct aliaslist *is_alias(const char *alias);
-static int srec(const char **hist, char *alias);
+static int srec(char **hist, char *alias);
 
 struct aliaslist{
 	char *com;
@@ -47,10 +47,14 @@ void add_alias(const char *alias, const char *command) {
 		length++;
 	}
 	else {
-		existing->ali = realloc(existing->ali, (strlen(alias) + 1) * sizeof(char));
+		char *tempali = existing->ali;
+		existing->ali = calloc((strlen(alias) + 1), sizeof(char));
 		strcpy(existing->ali, alias);
-		existing->com = realloc(existing->com, (strlen(command) + 1) * sizeof(char));
+		free(tempali);
+		char *tempcom = existing->com;
+		existing->com = calloc((strlen(command) + 1), sizeof(char));
 		strcpy(existing->com, command);
+		free(tempcom);
 		free(new);
 	}
 }
@@ -62,6 +66,8 @@ int remove_alias(const char *alias) {
 	struct aliaslist *current = tail;
 	if(!strcmp(current->ali, alias)){
 		tail = current->next;
+		free(current->ali);
+		free(current->com);
 		free(current);
 		length--;
 		return 0;
@@ -69,6 +75,8 @@ int remove_alias(const char *alias) {
 	while(current->next) {
 		if(!strcmp(current->next->ali,alias)){
 			struct aliaslist *temp = current->next->next;
+			free(current->next->ali);
+			free(current->next->com);
 			free(current->next);
 			current->next = temp;
 			length--;
@@ -106,12 +114,12 @@ int print_alias(const char *alias) {
 }
 
 
-char *expand_alias(char *alias) {
+char *resolve_alias(char *alias) {
 	if(!alias || !*alias){
 		return NULL;
 	}
 	char **hist = calloc(1,sizeof(char*));
-	int r = 0;
+	size_t r = 0;
 	char *ret = NULL;
 	struct aliaslist *current = is_alias(alias);
 	while(current) {
@@ -124,8 +132,7 @@ char *expand_alias(char *alias) {
 			*(hist+r) = calloc(strlen(current->ali)+1,sizeof(char)); 
 			strcpy(*(hist+r),current->ali);
 			r++;
-			hist = realloc(hist, r*sizeof(char*));
-			*(hist+r) = NULL;
+			hist = realloc(hist, (r+1)*sizeof(char*)); //keep null terminated
 			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
 			strcpy(ret, current->com);
 		}
@@ -134,7 +141,6 @@ char *expand_alias(char *alias) {
 	if (hist) {
 		free(hist);		
 	}
-
 	return ret;
 }
 
@@ -168,7 +174,6 @@ static struct aliaslist *generate_alias_item(const char *command, const char *al
 
 static struct aliaslist *is_alias(const char *alias){
 	if(!alias){
-		printf("nullboi\n");
 		return NULL;
 	}
 	struct aliaslist *current = tail;
@@ -181,12 +186,13 @@ static struct aliaslist *is_alias(const char *alias){
 	return NULL;
 }
 
-static int srec(const char **hist, char *alias){
+static int srec(char **hist, char *alias){
 	int i = 0;
 	while(*(hist+i)) {
 		if(!strcmp(*(hist+i),alias)){
 			return 1;
 		}
+		i++;
 	}
 	return 0;
 }
