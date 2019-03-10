@@ -133,6 +133,16 @@ void teardown_exports() {
 	return;
 }
 
+char *get_export_value(const char *name){
+	struct exportlist *e = is_export(name);
+	if(e){
+		char *ret = calloc( strlen(e->val) + 1, sizeof(char) );
+		strcpy(ret, e->val);
+		return ret;
+	}
+	return NULL;
+}
+
 static struct exportlist *is_export(const char *name){
 	if(!name){
 		return NULL;

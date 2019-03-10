@@ -13,11 +13,13 @@ void add_export(const char *name, const char *value);
 //remove export from list and environment
 int remove_export(const char *name);
 
-
+//print all exported variables
 void print_exportlist();
 
 
 int print_export_var(const char *name);
+
+char *get_export_value(const char *name);
 
 
 void teardown_exports();
