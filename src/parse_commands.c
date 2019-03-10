@@ -10,6 +10,7 @@
 #include <assert.h>
 
 #include "parse_commands.h"
+#include "aliasing.h"
 
 #define MAX_CMD_LEN 500
 #define MAX_ARG_AMT 50
@@ -32,9 +33,13 @@ char** parse_command(const char *command) {
 		if(uncommented) {
 			free(uncommented);
 		}
-		argv = generate_argv(parsed_command);
+		char *alias_expanded = expand_alias(parsed_command);
 		if(parsed_command){
 			free(parsed_command);	
+		}		
+		argv = generate_argv(alias_expanded);
+		if(alias_expanded){
+			free(alias_expanded);	
 		}
 	}
 	else{
@@ -139,6 +144,9 @@ char** generate_argv(char* command){
 	}
 	*(argv + i) = NULL;
 	argv = realloc(argv,(i+1)*sizeof(char*));
+	if(line){
+		free(line);
+	}
 	return argv;
 }
 
@@ -175,6 +183,7 @@ static char *get_arg(char *arg, char **endptr) {
 				break;
 			case '\0':
 				cont = (inq) ? 1 : 0;
+				i--;
 				break;
 			default:
 				temp[c] = arg[i];
@@ -193,3 +202,26 @@ static char *get_arg(char *arg, char **endptr) {
 	*endptr = (arg + i);
 	return ret; 
 }
+
+char *expand_alias(const char *line){
+	char *endptr;
+	char *alias = get_arg(line, &endptr);
+	char *expanded = resolve_alias(alias);
+	char *ret;
+	if(expanded){
+		size_t bodylength = (!(endptr || *endptr)) ? 0 : strlen(endptr); 
+		ret = calloc(strlen(expanded) + bodylength + 2, sizeof(char));
+		strcat(ret, expanded);
+		if(bodylength){
+			strcat(ret," ");
+			strcat(ret, endptr);
+		}
+		return ret;
+	}
+	else {
+		ret = calloc(strlen(line)+1, sizeof(char));
+		strcpy(ret, line);
+		return ret;
+	}	
+}
+

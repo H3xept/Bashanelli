@@ -20,4 +20,8 @@ int count_occ(const char* str, const char c);
 //returns alloced str without outer whitespace
 char* trim_whitespace(const char* str);
 
+//returns alloced str with first word replaced with alias
+//otherwise returns alloced copy of original str
+char *expand_alias(const char *line);
+
 #endif
