@@ -1,4 +1,4 @@
-#include <ANSIsACurse/cursor.h>
+//#include <ANSIsACurse/cursor.h>
 #include <BareBonesReadline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,49 +7,67 @@
 #include <sys/wait.h>
 #include <err.h>
 #include <stdint.h>
+#include <assert.h>
 
 #include "parse_commands.h"
+#include "aliasing.h"
 
 #define MAX_CMD_LEN 500
 #define MAX_ARG_AMT 50
-#define ARG_HAS_QUOTES(x) ((x!=NULL && (strchr(x,'"')!=NULL)))
 
 static char *get_arg(char *arg, char **endptr);
 
 char** parse_command(const char *command) {
-	if(!command){
+	if(!command || !*command){
 		return 0;
 	}
-	if(!*command){
-		return 0;
+	char* cmd_whitespace = trim_whitespace(command);
+	char *uncommented = ignore_comment(cmd_whitespace);
+	if(cmd_whitespace){
+		free(cmd_whitespace);
 	}
-	char* parsed_command = trim_whitespace(command);
-	ignore_comment(parsed_command);
-	char* parsed_command_old = parsed_command;
-	parsed_command = parse_line(parsed_command);
-	free(parsed_command_old);
+	#warning TEMPORARY FIX FOR PARSE_LINE NOT LIKING NULL
+	char** argv;
+	if (uncommented){
+		char* parsed_command = parse_line(uncommented);
+		if(uncommented) {
+			free(uncommented);
+		}
+		char *alias_expanded = expand_alias(parsed_command);
+		if(parsed_command){
+			free(parsed_command);	
+		}		
+		argv = generate_argv(alias_expanded);
+		if(alias_expanded){
+			free(alias_expanded);	
+		}
+	}
+	else{
+		argv = generate_argv(uncommented);
+		if(uncommented){
+			free(uncommented);	
+		}
+	}
 
-	char** argv = generate_argv(parsed_command);
-	free(parsed_command);
 	return argv;
 }
 
-char **seperate_into_commands(const char *command) {
-		if(!*command){
-		return NULL;
-	}
-	int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
-	char** argv = calloc(argc + 1, sizeof(char*));
-	char* arg = strtok(command, " ");
-	for(int i = 0; i < argc; i++){
-		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
-		strcpy(*(argv + i), arg);
-		arg = strtok(NULL, " ");
-	}
-	*(argv + argc) = NULL;
-	int i = 1;
-	return argv;
-}
+// char **seperate_into_commands(const char *command) {
+// 		if(!*command){
+// 		return NULL;
+// 	}
+// 	int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
+// 	char** argv = calloc(argc + 1, sizeof(char*));
+// 	char* arg = strtok(command, " ");
+// 	for(int i = 0; i < argc; i++){
+// 		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
+// 		strcpy(*(argv + i), arg);
+// 		arg = strtok(NULL, " ");
+// 	}
+// 	*(argv + argc) = NULL;
+// 	int i = 1;
+// 	return argv;
+// }
 
 int count_occ(const char* str, const char c){
 	int occurences = 0;
@@ -60,28 +78,51 @@ int count_occ(const char* str, const char c){
 }
 
 char* trim_whitespace(const char* str){
+	if(!str || !*str){
+		return NULL;
+	}
 	char* ret = str;
+	char* end = str + strlen(str)-1;
 	while(*ret == ' ' || *ret == '\n'){
 		ret++;
 	}
-	while(*(ret + strlen(ret) - 1) == ' ' || *(ret + strlen(ret) - 1) == '\n'){
-		*(ret + strlen(ret) - 1) = '\0';
+	while((*(end) == ' ' || *(end) == '\n') && end >= ret){
+		end--;
 	}
-	char* ret_allocated = calloc(strlen(ret) + 1, sizeof(char));
-	strcpy(ret_allocated, ret);
-	return ret_allocated;
+	if(ret > end){
+		return NULL;
+	}
+	else if (ret == end) {
+		char* ret_allocated = calloc(strlen(str)+1, sizeof(char));
+		strcpy(ret_allocated, str);
+		return ret_allocated;
+	}
+	else {
+		assert(end-ret);
+		char* ret_allocated = calloc((end - ret) + 2, sizeof(char));
+		strncpy(ret_allocated, ret, (end - ret)+1);
+		assert(ret_allocated);
+		return ret_allocated;
+	}
+
 }
 
-void ignore_comment(char *line) {
+char *ignore_comment(const char *line) {
+	if(!line || !*line){
+		return NULL;
+	}
 	if (*line == '#'){
-		free(line);
+		return NULL;
 	}
-
-	char *comment = strchr(line,'#'); 
-	if (comment && *(comment-1) == ' '){
-		*(comment-1) = '\0';
-		realloc(line, strlen(line)*sizeof(char));
+	char *comment = strchr(line,'#');
+	char *ret = calloc(strlen(line)+1, sizeof(char));
+	strcpy(ret, line); 
+	if (comment && *(comment-1) == ' ') {
+		assert(strlen(line)-strlen(comment) > 0);
+		ret = realloc(ret, (strlen(line)-strlen(comment))*sizeof(char));
+		*(ret+(strlen(line)-strlen(comment))) = '\0';
 	}
+	return ret;
 }
 
 char** generate_argv(char* command){
@@ -102,7 +143,10 @@ char** generate_argv(char* command){
 	 	i++;
 	}
 	*(argv + i) = NULL;
-	realloc(argv,(i+1)*sizeof(char*));
+	argv = realloc(argv,(i+1)*sizeof(char*));
+	if(line){
+		free(line);
+	}
 	return argv;
 }
 
@@ -139,6 +183,7 @@ static char *get_arg(char *arg, char **endptr) {
 				break;
 			case '\0':
 				cont = (inq) ? 1 : 0;
+				i--;
 				break;
 			default:
 				temp[c] = arg[i];
@@ -147,11 +192,36 @@ static char *get_arg(char *arg, char **endptr) {
 		}
 		i++;
 	}
-	char *ret = calloc(c,sizeof(char));
-	strcpy(ret,temp);
+	char *ret = (!c) ? NULL : calloc(c,sizeof(char));
+	if(ret){
+		strcpy(ret,temp);
+	}
 	while(arg[i] == ' ') {
 		i++;
 	}
 	*endptr = (arg + i);
 	return ret; 
 }
+
+char *expand_alias(const char *line){
+	char *endptr;
+	char *alias = get_arg(line, &endptr);
+	char *expanded = resolve_alias(alias);
+	char *ret;
+	if(expanded){
+		size_t bodylength = (!(endptr || *endptr)) ? 0 : strlen(endptr); 
+		ret = calloc(strlen(expanded) + bodylength + 2, sizeof(char));
+		strcat(ret, expanded);
+		if(bodylength){
+			strcat(ret," ");
+			strcat(ret, endptr);
+		}
+		return ret;
+	}
+	else {
+		ret = calloc(strlen(line)+1, sizeof(char));
+		strcpy(ret, line);
+		return ret;
+	}	
+}
+

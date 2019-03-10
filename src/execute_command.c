@@ -39,7 +39,12 @@ void execute_command(const char** argv){
 void parse_and_execute_command(const char* command){
 	char **argv = parse_command(command);
 	execute_command(argv);
-	if(argv){
+	if(argv ){
+		int i = 0;
+		while(*(argv+i)) {
+			free(*(argv+i));
+			i++;
+		}
 		free(argv);
 	}
 }
@@ -49,8 +54,10 @@ void execute_builtin(const char* command, const char** argv){
 }
 
 void execute_shell_script(const char* filename, const char** argv){
-	printf("Shell script argv support not implemented. Executing without args...\n");
-	handle_script(filename);
+	//printf("Shell script argv support not implemented. Executing without args...\n");
+	if(!is_script(filename)){
+		handle_script(filename);	
+	}
 }
 
 void execute_bin(const char* filename, const char** argv){

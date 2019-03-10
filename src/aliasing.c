@@ -7,8 +7,11 @@
 #include <ctype.h>
 #include <stdarg.h>
 
+#include "aliasing.h"
+
 static struct aliaslist *generate_alias_item(const char *command, const char *alias);
 static struct aliaslist *is_alias(const char *alias);
+static int srec(char **hist, char *alias);
 
 struct aliaslist{
 	char *com;
@@ -44,13 +47,117 @@ void add_alias(const char *alias, const char *command) {
 		length++;
 	}
 	else {
-		existing->ali = realloc(existing->ali, (strlen(alias) + 1) * sizeof(char));
+		char *tempali = existing->ali;
+		existing->ali = calloc((strlen(alias) + 1), sizeof(char));
 		strcpy(existing->ali, alias);
-		existing->com = realloc(existing->com, (strlen(command) + 1) * sizeof(char));
+		free(tempali);
+		char *tempcom = existing->com;
+		existing->com = calloc((strlen(command) + 1), sizeof(char));
 		strcpy(existing->com, command);
+		free(tempcom);
 		free(new);
 	}
+}
 
+int remove_alias(const char *alias) {
+	if (length == 0) {
+		return 1;
+	}
+	struct aliaslist *current = tail;
+	if(!strcmp(current->ali, alias)){
+		tail = current->next;
+		free(current->ali);
+		free(current->com);
+		free(current);
+		length--;
+		return 0;
+	}
+	while(current->next) {
+		if(!strcmp(current->next->ali,alias)){
+			struct aliaslist *temp = current->next->next;
+			free(current->next->ali);
+			free(current->next->com);
+			free(current->next);
+			current->next = temp;
+			length--;
+			return 0;
+		}
+		current = current->next;
+	}
+	return 1;
+}
+
+void print_aliaslist(){
+	if(!tail){
+		printf("\n");
+	}
+	struct aliaslist *current = tail;
+	while(current){
+		printf("alias %s = '%s'\n",current->ali,current->com);
+		current = current->next;
+	}
+}
+
+int print_alias(const char *alias) {
+	struct aliaslist *tmp = is_alias(alias);
+	char *command = NULL;
+	if(tmp){
+		command = tmp->com;		
+	}
+	if(command){
+		printf("alias %s = '%s'\n", alias, command);
+		return 0;
+	}
+	else {
+		return 1;
+	}
+}
+
+
+char *resolve_alias(char *alias) {
+	if(!alias || !*alias){
+		return NULL;
+	}
+	char **hist = calloc(1,sizeof(char*));
+	size_t r = 0;
+	char *ret = NULL;
+	struct aliaslist *current = is_alias(alias);
+	while(current) {
+		if (srec(hist, current->ali)) {//checknull
+			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
+			strcpy(ret, current->ali);
+			return ret;
+		}
+		else {
+			*(hist+r) = calloc(strlen(current->ali)+1,sizeof(char)); 
+			strcpy(*(hist+r),current->ali);
+			r++;
+			hist = realloc(hist, (r+1)*sizeof(char*)); //keep null terminated
+			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
+			strcpy(ret, current->com);
+		}
+		current = is_alias(current->com);
+	}
+	if (hist) {
+		free(hist);		
+	}
+	return ret;
+}
+
+void teardown_aliases() {
+	if (length == 0) {
+		return;
+	}
+	struct aliaslist *current = tail;
+	while(current) {
+			struct aliaslist *temp = current->next;
+			free(current);
+			current = temp;
+			length--;
+	}
+	head = NULL;
+	tail = NULL;
+	return;
 }
 
 static struct aliaslist *generate_alias_item(const char *command, const char *alias) {
@@ -66,6 +173,9 @@ static struct aliaslist *generate_alias_item(const char *command, const char *al
 }
 
 static struct aliaslist *is_alias(const char *alias){
+	if(!alias){
+		return NULL;
+	}
 	struct aliaslist *current = tail;
 	while(current){
 		if (!strcmp(current->ali,alias)){
@@ -76,11 +186,13 @@ static struct aliaslist *is_alias(const char *alias){
 	return NULL;
 }
 
-
-void print_aliaslist(){
-	struct aliaslist *current = tail;
-	while(current){
-		printf("alias %s = '%s'\n",current->ali,current->com);
-		current = current->next;
+static int srec(char **hist, char *alias){
+	int i = 0;
+	while(*(hist+i)) {
+		if(!strcmp(*(hist+i),alias)){
+			return 1;
+		}
+		i++;
 	}
+	return 0;
 }

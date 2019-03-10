@@ -44,8 +44,8 @@ void startup(const int argc, const char** argv){
 }
 
 static void load_profile_login(){
-	//#warning Profile loading disabled.
-	//return;
+	#warning Profile loading disabled.
+	return;
 	parse_and_execute_command("/etc/profile");
 	char* cmd = parse_line("~/.bash_profile");
 	parse_and_execute_command(cmd);
@@ -62,7 +62,7 @@ static void load_profile_login(){
 }
 
 static void load_profile_nonlogin(){
-	//return;
+	return;
 	parse_and_execute_command("/etc/bash.bashrc");
 	//exit(0);
 	char* cmd = parse_line("~/.bashrc");

@@ -10,9 +10,9 @@
 #include "parse_commands.h"
 
 #define MAX_CMD_LEN 500
-#define DEAFAULT_LINES 50
+#define DEFAULT_LINES 50
 
-int handle_script(char *filename) {
+int handle_script(const char *filename) {
 
 	unsigned int lines = 0;
 	char **scrlines = 0;
@@ -31,34 +31,31 @@ int handle_script(char *filename) {
 	int c = 0;
 	while(c < lines) {
 		if(*scrlines[c]){
-			parse_then_execute(scrlines[c]);	
+			parse_and_execute_command(scrlines[c]);	
 		}
 		c++;
 	}
-	free(scrlines);
+	int i = 0;
+	while(scrlines[i]){
+		free(scrlines[i]);
+		i++;
+	}
+	if(scrlines){
+		free(scrlines);
+	}
 	return 0;
 }
 
-void parse_then_execute(const char* command) {
-	char* pcom = parse_line(command);
-	char** args = parse_command(pcom);
-	execute_command(args);
-	free(pcom);
-	free(args);		
-}
-
-//reads file line by line and returns malloced char** 
-//if (line count) *lcount < actual number of lines in the file then *lcount is increased accordingly
-char **read_file(char* filepath, unsigned int *lcount) {
+char **read_file(const char* filepath, unsigned int *lcount) {
 	
-	*lcount = DEAFAULT_LINES; //default size, IK magic numbers are probably bad but whatever, it stops uninitialised and 0 lcount from breaking it.
+	*lcount = DEFAULT_LINES; //default size, IK magic numbers are probably bad but whatever, it stops uninitialised and 0 lcount from breaking it.
 	FILE* sfp = fopen(filepath,"r");
 	if (!sfp) {
 		*lcount = 0;
 		return 0;
 	}
 	
-	char **lines = malloc(*lcount*sizeof(char *));
+	char **lines = calloc(*lcount, sizeof(char *));
 	int c = 0;
 	char *tmp = 0;
 	size_t n = 0;
@@ -72,24 +69,23 @@ char **read_file(char* filepath, unsigned int *lcount) {
 		}
 		lines[c] = malloc(strlen(tmp)*sizeof(char)+1);
 		strcpy(lines[c],tmp);
-		REMOVE_NEWLINE(lines[c])
-		ignore_comment(lines[c]);
+		//REMOVE_NEWLINE(lines[c])
+		//ignore_comment(lines[c]);
 		c++;
+		char *oldtmp = tmp;
 		tmp = 0;
+		free(oldtmp);
 	}
 	*lcount = c;
 	fclose(sfp);
 	return lines;
 }
 
-//searches the PATH env variable for the filename
-//returns the full path to that file if present in PATH,
-//otherwise returns 0/NULL
-char *search_path(char* filename) {
+char *search_path(const char* filename) {
 
 	FILE *fp;
 	char *path, *ret, *tempath;
-	path = malloc(strlen(getenv("PATH"))*sizeof(char)+1);
+	path = malloc((strlen(getenv("PATH"))+1)*sizeof(char));
 	strcpy(path,getenv("PATH"));
 
 	if(!path)
@@ -110,5 +106,19 @@ char *search_path(char* filename) {
 		tempath = strtok(NULL,":");
 	}
 	free(path);
+	return 0;
+}
+
+int is_script(const char *path){
+	if(file_exists){
+		FILE *fp = fopen(path, "r");
+		char shebang[MAX_CMD_LEN] = {0};
+		fgets(shebang, MAX_CMD_LEN, fp);
+		REMOVE_NEWLINE(shebang)
+		if(shebang && shebang[0] == '#' && shebang[1] == '!'){
+			parse_and_execute_command(shebang+2);
+			return 1;
+		}
+	}
 	return 0;
 }

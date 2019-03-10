@@ -18,7 +18,6 @@ void test_generate_argv() {
 	char **args = generate_argv(str);
 	assert_eq_str(*args,"ls");
 	assert_eq_str(*(args+1),"-a");
-	execute_command(args);
 }
 
 void test_generate_argv_with_quotes() {
@@ -75,6 +74,12 @@ void test_generate_argv_another_backslash_escape() {
 	assert_eq_str(*(args+1),"b");
 }
 
+void test_generate_argv_multiple_escaped_spaces() {
+	char str[] = "\\ \\ ";
+	char **args = generate_argv(str);
+	assert_eq_str(*args,"  ");
+}
+
 void test_file_exists() {
 	FILE *fp = fopen("loltest","w");
 	assert_true(file_exists("loltest"));
@@ -82,9 +87,47 @@ void test_file_exists() {
 }
 
 void test_trim_outside_whitespace() {
-	char str1[] = "     some words    ";
+	char str1[] = " some words    ";
 	char *str2 = trim_whitespace(str1);
 	assert_eq_str(str2,"some words");
+}
+
+void test_trim_trailing_whitespace() {
+	char str1[] = "some words    ";
+	char *str2 = trim_whitespace(str1);
+	assert_eq_str(str2,"some words");
+}
+
+void test_trim_leading_whitespace() {
+	char str1[] = "   some words";
+	char *str2 = trim_whitespace(str1);
+	assert_eq_str(str2,"some words");
+}
+
+void test_trim_only_whitespace() {
+	char str1[] = "       ";
+	char *str2 = trim_whitespace(str1);
+	assert_true(!str2);
+}
+
+void test_parse_nulls1() {
+	char *str1 = 0;
+	parse_command(str1);
+}
+
+void test_parse_nulls2() {
+	char str2[] = "";
+	parse_command(str2);
+}
+
+void test_parse_nulls3() {
+	char str3[] = "#";
+	parse_command(str3);
+}
+
+void test_generate_argv_null(){
+	char *str3 = NULL;
+	generate_argv(str3);
 }
 
 void teardown(){
