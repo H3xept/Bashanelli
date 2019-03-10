@@ -22,22 +22,20 @@ char** parse_command(const char *command) {
 	if(!command || !*command){
 		return 0;
 	}
-	char* cmd_whitespace = trim_whitespace(command);
-	char *uncommented = ignore_comment(cmd_whitespace);
-	if(cmd_whitespace){
-		free(cmd_whitespace);
-	}
+	char *uncommented = ignore_comment(command);
 	#warning TEMPORARY FIX FOR PARSE_LINE NOT LIKING NULL
 	char** argv;
 	if (uncommented){
 		char* parsed_command = parse_line(uncommented);
 		char *export_expanded = expand_exvar(parsed_command);
 		char *alias_expanded = expand_alias(export_expanded);
-		argv = generate_argv(alias_expanded);
+		char* cmd_whitespace = trim_whitespace(alias_expanded);
+		argv = generate_argv(cmd_whitespace);
 		free(uncommented);
 		free(parsed_command);
 		free(export_expanded);	
-		free(alias_expanded);		
+		free(alias_expanded);
+		free(cmd_whitespace);		
 	}
 	else{
 		argv = generate_argv(uncommented);
@@ -181,8 +179,7 @@ static char *get_arg(char *arg, char **endptr) {
 				}
 				break;
 			case '\0':
-				cont = (inq) ? 1 : 0;
-				i--;
+				cont = 0;
 				break;
 			default:
 				temp[c] = arg[i];
@@ -235,11 +232,12 @@ char *expand_exvar(const char *line){
 	char *dp;
 	char *var;
 	//char *current = get_arg(line, &next);
+	//I'm sorry leo. . . don't look, skip the next line, it doesn't exist.
 	char *current = strtok(ln, " ");
 	while(current){
 		dp = strchr(current, '$');
 		if(dp){
-			if(dp > current+1){
+			if(dp > current){
 				strncat(tmp, current, (dp - current));
 			}
 			var = get_export_value(dp+1);
