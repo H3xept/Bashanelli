@@ -9,9 +9,9 @@
 #include "parse_commands.h"
 #include "execute_command.h"
 #include "startup.h"
+#include "generate_ps1.h"
 
 #define MAX_CMD_LEN 5000
-#define MAX_CWD_LEN 5000
 #define K_HOME_ENV "HOME"
 #define K_PATH_ENV "PATH"
 #define K_PS1_ENV "PS1"
@@ -41,12 +41,11 @@ int main(int argc, char const *argv[])
 	int is_done = 0;
 	init_readline(&is_done);
 
-	char* cwd[MAX_CWD_LEN];
+	
 	while(!is_done) {
-		getcwd(cwd, MAX_CWD_LEN);
-		char* prompt[MAX_CWD_LEN + 1];
-		sprintf(prompt, "%s>", cwd);
-		char* line = read_line(prompt);
+		char* ps1 = generate_ps1();
+		char* line = read_line(ps1);
+		free(ps1);
 		char** args = parse_command(line);
 		execute_command(args);
 		if(args && *args){
