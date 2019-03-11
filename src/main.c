@@ -55,7 +55,5 @@ int main(int argc, char const *argv[])
 			free(line);
 		}
 	}
-
-	printf("Env: %s\n",home_directory);
 	return 0;
 }
