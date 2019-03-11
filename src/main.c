@@ -10,8 +10,8 @@
 #include "execute_command.h"
 #include "startup.h"
 
-#define MAX_CMD_LEN 500
-#define MAX_CWD_LEN 500
+#define MAX_CMD_LEN 5000
+#define MAX_CWD_LEN 5000
 #define K_HOME_ENV "HOME"
 #define K_PATH_ENV "PATH"
 #define K_PS1_ENV "PS1"

@@ -24,4 +24,8 @@ char* trim_whitespace(const char* str);
 //otherwise returns alloced copy of original str
 char *expand_alias(const char *line);
 
+
+char *expand_exvar(const char *line);
+
+
 #endif

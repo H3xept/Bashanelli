@@ -10,9 +10,10 @@
 #include <assert.h>
 
 #include "parse_commands.h"
+#include "exporting.h"
 #include "aliasing.h"
 
-#define MAX_CMD_LEN 500
+#define MAX_CMD_LEN 10000
 #define MAX_ARG_AMT 50
 
 static char *get_arg(char *arg, char **endptr);
@@ -21,26 +22,20 @@ char** parse_command(const char *command) {
 	if(!command || !*command){
 		return 0;
 	}
-	char* cmd_whitespace = trim_whitespace(command);
-	char *uncommented = ignore_comment(cmd_whitespace);
-	if(cmd_whitespace){
-		free(cmd_whitespace);
-	}
+	char *uncommented = ignore_comment(command);
 	#warning TEMPORARY FIX FOR PARSE_LINE NOT LIKING NULL
 	char** argv;
 	if (uncommented){
 		char* parsed_command = parse_line(uncommented);
-		if(uncommented) {
-			free(uncommented);
-		}
-		char *alias_expanded = expand_alias(parsed_command);
-		if(parsed_command){
-			free(parsed_command);	
-		}		
-		argv = generate_argv(alias_expanded);
-		if(alias_expanded){
-			free(alias_expanded);	
-		}
+		char *export_expanded = expand_exvar(parsed_command);
+		char *alias_expanded = expand_alias(export_expanded);
+		char* cmd_whitespace = trim_whitespace(alias_expanded);
+		argv = generate_argv(cmd_whitespace);
+		free(uncommented);
+		free(parsed_command);
+		free(export_expanded);	
+		free(alias_expanded);
+		free(cmd_whitespace);		
 	}
 	else{
 		argv = generate_argv(uncommented);
@@ -164,9 +159,11 @@ static char *get_arg(char *arg, char **endptr) {
 	int indq = 0;
 	int cont = 1;
 	while(cont) {
-		
 		switch(arg[i]) {
 			case '\\':
+				if(arg[i+1] == '\0'){
+					break;
+				}
 				i++;
 				temp[c] = arg[i];
 				c++;
@@ -182,8 +179,7 @@ static char *get_arg(char *arg, char **endptr) {
 				}
 				break;
 			case '\0':
-				cont = (inq) ? 1 : 0;
-				i--;
+				cont = 0;
 				break;
 			default:
 				temp[c] = arg[i];
@@ -223,5 +219,44 @@ char *expand_alias(const char *line){
 		strcpy(ret, line);
 		return ret;
 	}	
+}
+
+char *expand_exvar(const char *line){
+	if(!line || !*line){
+		return NULL;
+	}
+	char ln[MAX_CMD_LEN] = {0};
+	strcpy(ln, line); 
+	char tmp[MAX_CMD_LEN] = {0};
+	char *next;
+	char *dp;
+	char *var;
+	//char *current = get_arg(line, &next);
+	//I'm sorry leo. . . don't look, skip the next line, it doesn't exist.
+	char *current = strtok(ln, " ");
+	while(current){
+		dp = strchr(current, '$');
+		if(dp){
+			if(dp > current){
+				strncat(tmp, current, (dp - current));
+			}
+			var = get_export_value(dp+1);
+			if(var){
+				strcat(tmp, var);
+			}
+			else{
+				strcat(tmp, " ");
+			}
+		}
+		else {
+			strcat(tmp, current);
+		}
+		strcat(tmp, " ");
+		//current =  get_arg(next, &next);
+		current = strtok(NULL, " ");
+	}
+	char *ret = calloc(strlen(tmp) + 1, sizeof(char));
+	strcpy(ret, tmp);
+	return ret;
 }
 
