@@ -160,6 +160,13 @@ static struct exportlist *generate_export(const char *value, const char *name) {
 }
 
 static void retrieve_environ(){
+	
+	#ifdef __MACH__
+	extern char **environ;
+	static char** __environ = NULL;
+	if (!__environ) { __environ = environ; }
+	#endif
+
 	int i = 0;
 	char *p = *(__environ+i);
 	while(p){
