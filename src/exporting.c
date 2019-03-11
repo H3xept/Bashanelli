@@ -9,6 +9,8 @@
 
 #include "exporting.h"
 
+extern char **environ;
+
 static struct exportlist *generate_export(const char *value, const char *name);
 static struct exportlist *is_export(const char *name);
 static void retrieve_environ();
@@ -171,7 +173,7 @@ static struct exportlist *generate_export(const char *value, const char *name) {
 
 static void retrieve_environ(){
 	int i = 0;
-	char *p = *(__environ+i);
+	char *p = *(environ+i);
 	while(p){
 		char *ep = strchr(p, '=');
 		if(ep) {
@@ -181,6 +183,6 @@ static void retrieve_environ(){
 			free(tmp);
 		}
 		i++;
-		p = *(__environ+i);
+		p = *(environ+i);
 	}
 }
