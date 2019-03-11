@@ -18,10 +18,22 @@ int handle_script(const char *filename) {
 	char **scrlines = 0;
 	char *inpath = 0;
 
-	inpath = search_path(filename);
-	if(inpath) {
-		scrlines = read_file(inpath, &lines);
-	} else {
+	int notinpath = 0;
+	for(int i = 0; i < strlen(filename); i++){
+		if(*(filename + i) == '/'){
+			notinpath = 1;
+			break;
+		}
+	}
+	if(!notinpath){
+			inpath = search_path(filename);
+		if(inpath) {
+			scrlines = read_file(inpath, &lines);
+		} else {
+			scrlines = read_file(filename, &lines);
+		}
+	}
+	else{
 		scrlines = read_file(filename, &lines);
 	}
 

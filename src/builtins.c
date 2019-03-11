@@ -7,15 +7,21 @@
 #include "builtins.h"
 #include "aliasing.h"
 #include "exporting.h"
+#include "execute_command.h"
 
 static void builtin_cd(const char** argv);
 static void builtin_export(const char **argv);
 static void builtin_alias(const char **argv);
 static void builtin_unalias(const char **argv);
+static void builtin_builtin(const char **argv);
+static void builtin_source(const char **argv);
 
-static const char* const builtins_list[] = {"cd", "export", "alias", "unalias"};
+static const char* const builtins_list[] = {"cd", "export", "alias", "unalias", "builtin", "source"};
 
 int builtin_id(const char* command){
+	if(!command){
+		return -1;
+	}
 	for(int i = 0; i < NUM_BUILTINS; i++){
 		if(!strcmp(command,*(builtins_list + i))){
 			return i;
@@ -41,6 +47,12 @@ void exec_builtin_id(const int id, const char** argv){
 			break;
 		case 3:
 			builtin_unalias(argv);
+			break;
+		case 4:
+			builtin_builtin(argv);
+			break;
+		case 5:
+			builtin_source(argv);
 			break;
 		default:
 			printf("Builtin id %d not found.\n", id);
@@ -131,4 +143,26 @@ if(!*(argv+1)){
 		p = *(argv+i);
 	}
 	return;
+}
+
+static void builtin_builtin(const char** argv){
+	if(!*(argv + 1)){
+		printf("builtin: usage: builtin [shell-builtin [args]]\n");
+		return;
+	}
+	exec_builtin_str(*(argv + 1), argv + 1);
+}
+
+static void builtin_source(const char** argv){
+	if(!*(argv + 1)){
+		printf("source: usage: source filename [args]\n");
+		return;
+	}
+	char* full_path = file_path(*(argv + 1));
+	if(full_path){
+		execute_shell_script(full_path, argv + 1);
+		free(full_path);
+		return;
+	}
+	execute_shell_script(*(argv + 1), argv + 1);
 }
