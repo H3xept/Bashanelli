@@ -13,7 +13,7 @@ static void builtin_export(const char **argv);
 static void builtin_alias(const char **argv);
 static void builtin_unalias(const char **argv);
 
-static char* builtins_list[] = {"cd", "export", "alias", "unalias"};
+static const char* const builtins_list[] = {"cd", "export", "alias", "unalias"};
 
 int builtin_id(const char* command){
 	for(int i = 0; i < NUM_BUILTINS; i++){
@@ -63,7 +63,7 @@ static void builtin_export(const char **argv){
 	}
 	int i = 1;
 	if(!strcmp(*(argv+i),"-p")){
-		print_aliaslist();
+		print_exportlist();
 		i++;
 	}
 	char *p = *(argv+i);

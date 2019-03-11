@@ -64,7 +64,6 @@ static void load_profile_login(){
 static void load_profile_nonlogin(){
 	return;
 	parse_and_execute_command("/etc/bash.bashrc");
-	//exit(0);
 	char* cmd = parse_line("~/.bashrc");
 	parse_and_execute_command(cmd);
 	free(cmd);
