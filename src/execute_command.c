@@ -77,7 +77,15 @@ void execute_shell_script(const char* filename, const char** argv){
 		printf("Cannot run executable file as script: %s\n", filename);
 		return;
 	}
-	handle_script(filename);	
+	pid_t pid = fork();
+	if(!pid){
+		handle_script(filename);
+		exit(0);
+	}
+	else{
+		waitpid(pid, NULL, 0);
+	}
+		
 }
 
 void execute_bin(const char* filename, const char** argv){
