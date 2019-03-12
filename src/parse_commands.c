@@ -1,5 +1,6 @@
 //#include <ANSIsACurse/cursor.h>
 #include <BareBonesReadline/readline.h>
+#include <BareBonesReadline/tokenizer.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +13,7 @@
 #include "parse_commands.h"
 #include "exporting.h"
 #include "aliasing.h"
+#include "argv.h"
 
 #define MAX_CMD_LEN 10000
 #define MAX_ARG_AMT 50
@@ -233,28 +235,40 @@ char *expand_exvar(const char *line){
 	char *var;
 	//char *current = get_arg(line, &next);
 	//I'm sorry leo. . . don't look, skip the next line, it doesn't exist.
-	char *current = strtok(ln, " ");
+	Tokenizer* tok = new_tokenizer(ln, ' ');
+	char* current = next_token(tok);
 	while(current){
 		dp = strchr(current, '$');
 		if(dp){
 			if(dp > current){
 				strncat(tmp, current, (dp - current));
 			}
-			var = get_export_value(dp+1);
-			if(var){
-				strcat(tmp, var);
+			int arg = (int)strtol(dp + 1, dp + strlen(dp), 10);
+			if(arg || *(dp + 1) == '0'){
+				char* indexed_arg = get_arg_from_current_argv(arg);
+				strcat(tmp, indexed_arg);
 			}
 			else{
-				strcat(tmp, " ");
+				var = get_export_value(dp+1);
+				if(var){
+					strcat(tmp, var);
+				}
+				else{
+					strcat(tmp, " ");
+				}
 			}
+			// printf(";%x;", arg);
+			
 		}
 		else {
 			strcat(tmp, current);
 		}
 		strcat(tmp, " ");
 		//current =  get_arg(next, &next);
-		current = strtok(NULL, " ");
+		free(current);
+		current = next_token(tok);
 	}
+	destroy_tokenizer(tok);
 	char *ret = calloc(strlen(tmp) + 1, sizeof(char));
 	strcpy(ret, tmp);
 	return ret;

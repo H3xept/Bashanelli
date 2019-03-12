@@ -10,6 +10,7 @@
 #include "execute_command.h"
 #include "startup.h"
 #include "generate_ps1.h"
+#include "argv.h"
 
 #define MAX_CMD_LEN 5000
 #define K_HOME_ENV "HOME"
@@ -26,6 +27,9 @@ int main(int argc, char const *argv[])
 	char* home_directory = getenv(K_HOME_ENV);
 	char* env_path = getenv(K_PATH_ENV);
 	char* history = NULL;
+
+	init_argv();
+	push_argv_frame(argv, argc);
 
 	if (chdir(home_directory) != 0) {
 		// DIE

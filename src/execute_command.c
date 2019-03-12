@@ -13,6 +13,7 @@
 #include "script_handling.h"
 #include "parse_commands.h"
 #include "builtins.h"
+#include "argv.h"
 
 void execute_command(const char** argv){
 	if(!argv || !*argv){
@@ -77,15 +78,20 @@ void execute_shell_script(const char* filename, const char** argv){
 		printf("Cannot run executable file as script: %s\n", filename);
 		return;
 	}
+	int i = 0;
+	while(*(argv + i)){
+		i++;
+	}
 	pid_t pid = fork();
 	if(!pid){
+		push_argv_frame(argv, i);
 		handle_script(filename);
 		exit(0);
 	}
 	else{
 		waitpid(pid, NULL, 0);
 	}
-		
+
 }
 
 void execute_bin(const char* filename, const char** argv){
