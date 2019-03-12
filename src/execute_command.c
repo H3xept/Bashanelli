@@ -18,31 +18,31 @@ void execute_command(const char** argv){
 	if(!argv || !*argv){
 		return;
 	}
-	char* full_filepath = file_path(*argv);
-	if(full_filepath){
-		if(is_executable(full_filepath)){
-			execute_bin(full_filepath, argv);
-		}
-		else{
-			execute_shell_script(full_filepath, argv);
-		}
-		free(full_filepath);
-		return;
-	}
-	if(file_exists(argv[0])){
-		if(is_executable(argv[0])){
-			execute_bin(argv[0], argv);
-		}
-		else{
-			execute_shell_script(argv[0], argv);
-		}
+	if(is_builtin(argv[0])){
+		execute_builtin(argv[0], argv);
 	}
 	else{
-		if(is_builtin(argv[0])){
-			execute_builtin(argv[0], argv);
+		char* full_filepath = file_path(*argv);
+		if(full_filepath){
+			if(is_executable(full_filepath)){
+				execute_bin(full_filepath, argv);
+			}
+			else{
+				execute_shell_script(full_filepath, argv);
+			}
+			free(full_filepath);
+			return;
+		}
+		if(file_exists(argv[0])){
+			if(is_executable(argv[0])){
+				execute_bin(argv[0], argv);
+			}
+			else{
+				execute_shell_script(argv[0], argv);
+			}
 		}
 		else{
-			execute_bin(argv[0], argv);
+			printf("%s: command not found\n", argv[0]);
 		}
 	}
 }
@@ -66,6 +66,7 @@ void execute_builtin(const char* command, const char** argv){
 
 void execute_shell_script(const char* filename, const char** argv){
 	//printf("Shell script argv support not implemented. Executing without args...\n");
+	printf("shell\n");
 	if(!filename){
 		return;
 	}
@@ -83,6 +84,7 @@ void execute_shell_script(const char* filename, const char** argv){
 }
 
 void execute_bin(const char* filename, const char** argv){
+	printf("bin\n");
 	pid_t pid = fork();
 	if(!pid){
 		if(execvp(filename, argv) == -1){
