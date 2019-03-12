@@ -66,7 +66,6 @@ void execute_builtin(const char* command, const char** argv){
 
 void execute_shell_script(const char* filename, const char** argv){
 	//printf("Shell script argv support not implemented. Executing without args...\n");
-	printf("shell\n");
 	if(!filename){
 		return;
 	}
@@ -78,13 +77,10 @@ void execute_shell_script(const char* filename, const char** argv){
 		printf("Cannot run executable file as script: %s\n", filename);
 		return;
 	}
-	if(!is_script(filename)){
-		handle_script(filename);	
-	}
+	handle_script(filename);	
 }
 
 void execute_bin(const char* filename, const char** argv){
-	printf("bin\n");
 	pid_t pid = fork();
 	if(!pid){
 		if(execvp(filename, argv) == -1){
