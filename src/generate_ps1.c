@@ -1,11 +1,14 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ANSIsACurse/characters.h>
 
 #define MAX_CWD_LEN 5000
 #define MAX_LOGIN_LEN 5000
 #define MAX_HOSTNAME_LEN 5000
+
+#define K_HOME_ENV "HOME"
 
 char* generate_ps1(){
 	char cwd[MAX_CWD_LEN];
@@ -19,7 +22,21 @@ char* generate_ps1(){
 	sprintf(login_hostname, "%s@%s", login, hostname);
 
 	char* login_hostname_color = c_color_string(login_hostname, C_COLOR_CODE_Green);
-	char* working_dir = c_color_string(cwd, C_COLOR_CODE_Blue);
+	
+	char* home_directory = getenv(K_HOME_ENV);
+
+	char cwd_with_tilde[MAX_CWD_LEN];
+	if(strstr(cwd, home_directory) == cwd){
+		cwd_with_tilde[0] = '~';
+		for(int i = strlen(home_directory); i < strlen(cwd); i++){
+			cwd_with_tilde[i - strlen(home_directory) + 1] = cwd[i];
+		}
+	}
+	else{
+		strcpy(cwd_with_tilde, cwd);
+	}
+
+	char* working_dir = c_color_string(cwd_with_tilde, C_COLOR_CODE_Blue);
 
 	char ps1[MAX_HOSTNAME_LEN + MAX_LOGIN_LEN + MAX_CWD_LEN];
 

@@ -1,7 +1,7 @@
 #ifndef __BUILTINS__
 #define __BUILTINS__
 
-#define NUM_BUILTINS 7
+#define NUM_BUILTINS 8
 
 void init_builtins();
 int builtin_id(const char* command);

@@ -16,34 +16,32 @@
 #define K_HOME_ENV "HOME"
 #define K_PATH_ENV "PATH"
 #define K_PS1_ENV "PS1"
-
-char* read_history() {
-	return "ls\ncd \"lolz\"";
-}
+#define HISTORY_FILE ".bnli_history"
 
 int main(int argc, char const *argv[])
 {	
 	char* home_directory = getenv(K_HOME_ENV);
-	char* history = NULL;
 
 	init_argv();
 	push_argv_frame(argv, argc);
 
 	if (chdir(home_directory) != 0) {
-		// DIE
 		printf("Could not change directory!");
 		exit(-1);
 	}
 
-	history = read_history();
 	init_aliases();
 	init_exports();
 
-	startup(argc, argv);
 	int is_done = 0;
 	init_readline(&is_done);
-
+	if(!file_exists(HISTORY_FILE)){
+		fclose(fopen(HISTORY_FILE, "w"));
+	}
+	import_history_from_file(HISTORY_FILE);
 	
+	startup(argc, argv);
+
 	while(!is_done) {
 		char* ps1 = generate_ps1();
 		char* line = read_line(ps1);
@@ -56,6 +54,7 @@ int main(int argc, char const *argv[])
 		if(line && *line){
 			free(line);
 		}
+		export_history_to_file(HISTORY_FILE);
 	}
 	return 0;
 }
