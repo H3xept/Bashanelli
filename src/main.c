@@ -23,9 +23,7 @@ char* read_history() {
 
 int main(int argc, char const *argv[])
 {	
-	char buffer[MAX_CMD_LEN];
 	char* home_directory = getenv(K_HOME_ENV);
-	char* env_path = getenv(K_PATH_ENV);
 	char* history = NULL;
 
 	init_argv();
@@ -50,7 +48,7 @@ int main(int argc, char const *argv[])
 		char* ps1 = generate_ps1();
 		char* line = read_line(ps1);
 		free(ps1);
-		char** args = parse_command(line);
+		const char** args = (const char**)parse_command(line);
 		execute_command(args);
 		if(args && *args){
 			free(args);

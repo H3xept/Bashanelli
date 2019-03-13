@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 struct argv_frame{
 	struct argv_frame* next;
@@ -39,7 +40,7 @@ void push_argv_frame(const char** argv, const int argc){
 
 void pop_argv_frame(){
 	if(!end){
-		return NULL;
+		return;
 	}
 	struct argv_frame* frame = end;
 	struct argv_frame* current = start;

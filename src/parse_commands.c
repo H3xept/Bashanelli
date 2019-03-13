@@ -18,7 +18,7 @@
 #define MAX_CMD_LEN 10000
 #define MAX_ARG_AMT 50
 
-static char *get_arg(char *arg, char **endptr);
+static char *get_arg(const char *arg, const char **endptr);
 
 char** parse_command(const char *command) {
 	if(!command || !*command){
@@ -78,8 +78,8 @@ char* trim_whitespace(const char* str){
 	if(!str || !*str){
 		return NULL;
 	}
-	char* ret = str;
-	char* end = str + strlen(str)-1;
+	const char* ret = str;
+	const char* end = str + strlen(str)-1;
 	while(*ret == ' ' || *ret == '\n'){
 		ret++;
 	}
@@ -130,13 +130,13 @@ char** generate_argv(char* command){
 	strcpy(line,command);
 	char *arg;
 	int i = 0;
-	char *nextarg;
+	const char* nextarg = NULL;
 	char** argv = calloc(MAX_ARG_AMT, sizeof(char*));
 	arg = get_arg(line,&nextarg);
 	while(arg != NULL) {
 		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
 		strcpy(*(argv + i), arg);
-		arg = get_arg(nextarg,&nextarg);
+		arg = get_arg(nextarg, &nextarg);
 	 	i++;
 	}
 	*(argv + i) = NULL;
@@ -148,9 +148,9 @@ char** generate_argv(char* command){
 }
 
 //custom strtok for handling quoted args, ignoring spaces etc.
-static char *get_arg(char *arg, char **endptr) {
+static char *get_arg(const char *arg, const char **endptr) {
 	if (!arg || !*arg){
-		*endptr = NULL;
+		// *endptr = NULL;
 		return NULL;
 	}
 
@@ -158,7 +158,6 @@ static char *get_arg(char *arg, char **endptr) {
 	int i = 0;
 	int c = 0;
 	int inq = 0;
-	int indq = 0;
 	int cont = 1;
 	while(cont) {
 		switch(arg[i]) {
@@ -202,7 +201,7 @@ static char *get_arg(char *arg, char **endptr) {
 }
 
 char *expand_alias(const char *line){
-	char *endptr;
+	const char *endptr;
 	char *alias = get_arg(line, &endptr);
 	char *expanded = resolve_alias(alias);
 	char *ret;
@@ -230,7 +229,6 @@ char *expand_exvar(const char *line){
 	char ln[MAX_CMD_LEN] = {0};
 	strcpy(ln, line); 
 	char tmp[MAX_CMD_LEN] = {0};
-	char *next;
 	char *dp;
 	char *var;
 	//char *current = get_arg(line, &next);
@@ -243,7 +241,7 @@ char *expand_exvar(const char *line){
 			if(dp > current){
 				strncat(tmp, current, (dp - current));
 			}
-			int arg = (int)strtol(dp + 1, dp + strlen(dp), 10);
+			int arg = (int)strtol(dp + 1, NULL, 10);
 			if(arg || *(dp + 1) == '0'){
 				char* indexed_arg = get_arg_from_current_argv(arg);
 				strcat(tmp, indexed_arg);

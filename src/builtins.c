@@ -35,7 +35,7 @@ void exec_builtin_str(const char* command, const char** argv){
 	exec_builtin_id(builtin_id(command), argv);
 }
 
-void exec_builtin_id(const int id, const char** argv){
+void exec_builtin_id(int id, const char** argv){
 	switch(id){
 		case 0:
 			builtin_cd(argv);
@@ -72,7 +72,7 @@ static void builtin_cd(const char** argv){
 	}
 }
 
-static void builtin_export(const char **argv){
+static void builtin_export(const char** argv){
 	if(!*(argv+1)){
 		print_exportlist();
 		return;
@@ -82,7 +82,7 @@ static void builtin_export(const char **argv){
 		print_exportlist();
 		i++;
 	}
-	char *p = *(argv+i);
+	const char *p = *(argv+i);
 	while(p){
 		char *ep = strchr(p, '=');
 		if(ep) {
@@ -97,7 +97,7 @@ static void builtin_export(const char **argv){
 	return;
 }
 
-static void builtin_alias(const char **argv){
+static void builtin_alias(const char** argv){
 	if(!*(argv+1)){
 		print_aliaslist();
 		return;
@@ -107,7 +107,7 @@ static void builtin_alias(const char **argv){
 		print_aliaslist();
 		i++;
 	}
-	char *p = *(argv+i);
+	const char *p = *(argv+i);
 	while(p){
 		char *ep = strchr(p, '=');
 		if(ep) {
@@ -127,7 +127,7 @@ static void builtin_alias(const char **argv){
 	return;
 }
 
-static void builtin_unalias(const char **argv){
+static void builtin_unalias(const char** argv){
 if(!*(argv+1)){
 		warnx("unalias: usage: unalias [-a] name [name ...]\n");
 		return;
@@ -138,7 +138,7 @@ if(!*(argv+1)){
 		init_aliases();
 		return;
 	}
-	char *p = *(argv+i);
+	const char *p = *(argv+i);
 	while(p){
 		if(remove_alias(p)) {
 			warnx("alias: %s: was not found", p);
@@ -162,10 +162,10 @@ static void builtin_source(const char** argv){
 		printf("source: usage: source filename [args]\n");
 		return;
 	}
-	char* full_path = file_path(*(argv + 1));
+	const char* full_path = file_path(*(argv + 1));
 	if(full_path){
 		execute_shell_script(full_path, argv + 1);
-		free(full_path);
+		free((char*)full_path);
 		return;
 	}
 	execute_shell_script(*(argv + 1), argv + 1);
@@ -176,10 +176,10 @@ static void builtin_exec(const char** argv){
 		printf("exec: usage: exec filename [args]\n");
 		return;
 	}
-	char* full_path = file_path(*(argv + 1));
+	const char* full_path = file_path(*(argv + 1));
 	if(full_path){
 		execute_bin(full_path, argv + 1);
-		free(full_path);
+		free((char*)full_path);
 		return;
 	}
 	execute_bin(*(argv + 1), argv + 1);

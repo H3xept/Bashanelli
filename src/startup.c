@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <BareBonesReadline/readline.h>
 
+#include "parse_commands.h"
 #include "execute_command.h"
-#include "../dependencies/BareBonesReadline/readline.h"
 
 
 static void load_profile_login();
@@ -15,7 +16,7 @@ void startup(const int argc, const char** argv){
 	int noprofile = 0;
 	int first_non_flag_arg = -1;
 	for(int i = 1; i < argc; i++){
-		if(!*argv[i] == '-'){
+		if(!(*argv[i] == '-')){
 			first_non_flag_arg = i;
 		}
 		else{
@@ -38,7 +39,8 @@ void startup(const int argc, const char** argv){
 	
 	if(first_non_flag_arg > 0){
 		char* cmd = parse_line(argv[first_non_flag_arg]);
-		parse_and_execute_command(cmd);
+		// parse_and_execute_command(cmd);
+		execute_shell_script(cmd, (const char**)parse_command(cmd));
 		free(cmd);
 	}
 }

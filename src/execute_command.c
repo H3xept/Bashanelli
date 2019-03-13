@@ -23,7 +23,7 @@ void execute_command(const char** argv){
 		execute_builtin(argv[0], argv);
 	}
 	else{
-		char* full_filepath = file_path(*argv);
+		const char* full_filepath = file_path(*argv);
 		if(full_filepath){
 			if(is_executable(full_filepath)){
 				execute_bin(full_filepath, argv);
@@ -31,7 +31,7 @@ void execute_command(const char** argv){
 			else{
 				execute_shell_script(full_filepath, argv);
 			}
-			free(full_filepath);
+			free((char*)full_filepath);
 			return;
 		}
 		if(file_exists(argv[0])){
@@ -49,8 +49,8 @@ void execute_command(const char** argv){
 }
 
 void parse_and_execute_command(const char* command){
-	char **argv = parse_command(command);
-	execute_command(argv);
+	char** argv = parse_command(command);
+	execute_command((const char**)argv);
 	if(argv ){
 		int i = 0;
 		while(*(argv+i)) {
@@ -94,10 +94,10 @@ void execute_shell_script(const char* filename, const char** argv){
 
 }
 
-void execute_bin(const char* filename, const char** argv){
+void execute_bin(const char* filename, const char** argv) {
 	pid_t pid = fork();
 	if(!pid){
-		if(execvp(filename, argv) == -1){
+		if(execvp(filename, ((char* const *)argv)) == -1){
 			printf("%s: command not found\n", filename);
 			fflush(stdout);
 		};
@@ -108,11 +108,11 @@ void execute_bin(const char* filename, const char** argv){
 	}
 }
 
-int is_builtin(const char* command){
+int is_builtin(const char* const command){
 	return builtin_id(command) >= 0;
 }
 
-int is_executable(const char* filename){
+int is_executable(const char* const filename){
 	FILE* f = fopen(filename, "rb");
 	if(!f){
 		return 0;
@@ -129,12 +129,9 @@ int is_executable(const char* filename){
 }
 
 
-int file_exists(const char* filename){
+int file_exists(const char* const filename){
 	FILE* f = fopen(filename, "rb");
-	char* t = calloc(100, sizeof(char));
-	if(!f){
-		return 0;
-	}
+	if(!f) return 0;
 	fclose(f);
 	return 1;
 }
