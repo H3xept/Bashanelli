@@ -155,7 +155,7 @@ const char* file_path(const char* filename){
 			while(*(path_pointer + i) != ':' && *(path_pointer + i) != '\0'){
 				i++;
 			}
-			char* path = calloc(i + strlen(filename) + 1, sizeof(char));
+			char* path = calloc(i + strlen(filename) + strlen(path_pointer) + 1, sizeof(char));
 			if(*(path_pointer + i) == ':'){
 				*(path_pointer + i) = '\0';
 				strcpy(path, path_pointer);
