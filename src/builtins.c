@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <err.h>
 #include <unistd.h>
+#include <BareBonesHistory/history.h>
 
 #include "builtins.h"
 #include "aliasing.h"
@@ -16,8 +17,9 @@ static void builtin_unalias(const char **argv);
 static void builtin_builtin(const char **argv);
 static void builtin_source(const char **argv);
 static void builtin_exec(const char** argv);
+static void builtin_history(const char** argv);
 
-static const char* const builtins_list[] = {"cd", "export", "alias", "unalias", "builtin", "source", "exec"};
+static const char* const builtins_list[] = {"cd", "export", "alias", "unalias", "builtin", "source", "exec", "history"};
 
 int builtin_id(const char* command){
 	if(!command){
@@ -57,6 +59,9 @@ void exec_builtin_id(int id, const char** argv){
 			break;
 		case 6:
 			builtin_exec(argv);
+			break;
+		case 7:
+			builtin_history(argv);
 			break;
 		default:
 			printf("Builtin id %d not found.\n", id);
@@ -183,4 +188,15 @@ static void builtin_exec(const char** argv){
 		return;
 	}
 	execute_bin(*(argv + 1), argv + 1);
+}
+
+static void builtin_history(const char** argv){
+	char** entries = get_entire_history();
+	if(!entries){
+		return;
+	}
+	for(int i = 0; i < entries_n(); i++){
+		printf(" %d\t%s\n", i + 1, *(entries + i));
+	}
+	free(entries);
 }
