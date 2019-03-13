@@ -28,13 +28,11 @@ char** parse_command(const char *command) {
 	#warning TEMPORARY FIX FOR PARSE_LINE NOT LIKING NULL
 	char** argv;
 	if (uncommented){
-		char* parsed_command = parse_line(uncommented);
-		char *export_expanded = expand_exvar(parsed_command);
+		char *export_expanded = expand_exvar(uncommented);
 		char *alias_expanded = expand_alias(export_expanded);
 		char* cmd_whitespace = trim_whitespace(alias_expanded);
 		argv = generate_argv(cmd_whitespace);
 		free(uncommented);
-		free(parsed_command);
 		free(export_expanded);	
 		free(alias_expanded);
 		free(cmd_whitespace);		
