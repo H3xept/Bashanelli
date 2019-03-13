@@ -122,7 +122,9 @@ int is_executable(const char* const filename){
 	fclose(f);
 	#ifdef __MACH__
 	return signature == SIGNATURE_MACH_O
-		|| signature == SIGNATURE_MACH_O_REVERSE;
+		|| signature == SIGNATURE_MACH_O_REVERSE
+		|| signature == SIGNATURE_MACH_O_64
+		|| signature == SIGNATURE_MACH_O_64_REVERSE;
 	#endif
 	return signature == SIGNATURE_ELF
 		|| signature == SIGNATURE_ELF_REVERSE;

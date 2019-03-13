@@ -3,7 +3,10 @@
 
 
 #define SIGNATURE_MACH_O 0xfeedface
+#define SIGNATURE_MACH_O_64 0xfeedfacf
 #define SIGNATURE_MACH_O_REVERSE 0xcefaedfe
+#define SIGNATURE_MACH_O_64_REVERSE 0xcffaedfe
+
 #define SIGNATURE_ELF 0x7f454c46
 #define SIGNATURE_ELF_REVERSE 0x464c457f
 
