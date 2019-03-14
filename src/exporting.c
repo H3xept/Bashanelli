@@ -104,21 +104,6 @@ void print_exportlist(){
 	}
 }
 
-#warning Sorry what
-// int print_export_var(const char *name) {
-// 	struct exportlist *tmp = getenv(name);
-// 	char *value = NULL;
-// 	if(tmp){
-// 		value = tmp->val;		
-// 	}
-// 	if(value){
-// 		printf("declare -x  %s='%s'\n", name, value);
-// 		return 0;
-// 	}
-// 	else {
-// 		return 1;
-// 	}
-// }
 int print_export_var(const char *name) {
 	char* value = getenv(name);
 	if(value){
