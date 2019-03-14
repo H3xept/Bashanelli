@@ -75,7 +75,7 @@ export PS1="\\033[1m\\033[32m\\u@\\h\\033[0m:\\033[1m\\033[34m\\w\\033[0m\\033[1
 
 With a user "bob" on a machine "myComputer", the PS1 will look as follows:
 
-**<span style="color:green">bob@myComputer</span>:<span style="color:blue">~/Documents</span>>**  <sub>please imagine colours here, GitHub supresses CSS text coloring</sub>
+![prompt](https://user-images.githubusercontent.com/30571778/54396454-f0cf1a80-46aa-11e9-9885-d8d261d9515c.png)
 
 ---
 
