@@ -38,10 +38,7 @@ char** parse_command(const char *command) {
 		free(cmd_whitespace);		
 	}
 	else{
-		argv = generate_argv(uncommented);
-		if(uncommented){
-			free(uncommented);	
-		}
+		return NULL;
 	}
 
 	return argv;
@@ -187,7 +184,7 @@ static char *get_arg(const char *arg, const char **endptr) {
 		}
 		i++;
 	}
-	char *ret = (!c) ? NULL : calloc(c,sizeof(char));
+	char *ret = (!c) ? NULL : calloc(c + 1,sizeof(char));
 	if(ret){
 		strcpy(ret,temp);
 	}

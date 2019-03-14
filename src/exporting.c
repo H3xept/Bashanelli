@@ -169,9 +169,9 @@ static struct exportlist *is_export(const char *name){
 }
 
 static struct exportlist *generate_export(const char *value, const char *name) {
-	char *c = calloc(strlen(value),sizeof(char));
+	char *c = calloc(strlen(value) + 1,sizeof(char));
 	strcpy(c,value);
-	char *a = calloc(strlen(name),sizeof(char));
+	char *a = calloc(strlen(name) + 1,sizeof(char));
 	strcpy(a,name);
 	struct exportlist *new = calloc(1,sizeof(struct exportlist));
 	new->val = c;

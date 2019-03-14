@@ -50,12 +50,8 @@ void execute_command(const char** argv){
 }
 
 void parse_and_execute_command(const char* command){
-	#warning THE WHOLE PROGRAM CRASHES WHEN THIS LINE IS TAKEN AWAY
-	
 	char* parsed_line = parse_line(command);
-	printf("got this far!\n");
 	char** argv = parse_command(parsed_line);
-
 	execute_command((const char**)argv);
 	if(argv ){
 		int i = 0;
