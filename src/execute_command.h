@@ -30,5 +30,6 @@ int is_builtin(const char* command);
 int is_executable(const char* filename);
 int file_exists(const char* filename);
 const char* file_path(const char* filename);
+int is_dir(const char* path);
 
 #endif

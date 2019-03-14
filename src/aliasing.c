@@ -89,7 +89,7 @@ int remove_alias(const char *alias) {
 
 void print_aliaslist(){
 	if(!tail){
-		printf("\n");
+		printf("No aliases found\n");
 	}
 	struct aliaslist *current = tail;
 	while(current){

@@ -42,7 +42,7 @@ char* generate_ps1(){
 	char working_dir_w_tilde[MAX_CWD_LEN];
 	if(strstr(working_dir, home_directory) == working_dir){
 		working_dir_w_tilde[0] = '~';
-		for(int i = strlen(home_directory); i < strlen(working_dir); i++){
+		for(int i = strlen(home_directory); i < strlen(working_dir) + 1; i++){
 			working_dir_w_tilde[i - strlen(home_directory) + 1] = working_dir[i];
 		}
 	}

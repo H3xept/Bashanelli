@@ -37,6 +37,7 @@ int main(int argc, char const *argv[])
 
 	init_aliases();
 	init_exports();
+	add_export("PWD", home_directory);
 
 	int is_done = 0;
 	init_readline(&is_done);

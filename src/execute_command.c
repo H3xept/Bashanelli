@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <err.h>
 #include <stdint.h>
 #include <assert.h>
@@ -24,7 +25,7 @@ void execute_command(const char** argv){
 		execute_builtin(argv[0], argv);
 	}
 	else{
-		const char* full_filepath = file_path(*argv);
+		const char* full_filepath = file_path(argv[0]);
 		if(full_filepath){
 			if(is_executable(full_filepath)){
 				execute_bin(full_filepath, argv);
@@ -40,6 +41,10 @@ void execute_command(const char** argv){
 				execute_bin(argv[0], argv);
 			}
 			else{
+				if(is_dir(argv[0])){
+					printf("bashanelli: %s: Is a directory\n", argv[0]);
+					return;
+				}
 				execute_shell_script(argv[0], argv);
 			}
 		}
@@ -132,6 +137,12 @@ int file_exists(const char* const filename){
 	if(!f) return 0;
 	fclose(f);
 	return 1;
+}
+
+int is_dir(const char* path){
+	struct stat st;
+	stat(path, &st);
+	return !S_ISREG(st.st_mode);
 }
 
 // Returns the full path of a file present in a directory specified by the PATH env variable.

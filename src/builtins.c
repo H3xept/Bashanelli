@@ -10,6 +10,10 @@
 #include "exporting.h"
 #include "execute_command.h"
 
+#define HISTORY_FILE ".bnli_history"
+#define K_HOME_ENV "HOME"
+#define MAX_CWD_LEN 5000
+
 static void builtin_cd(const char** argv);
 static void builtin_export(const char **argv);
 static void builtin_alias(const char **argv);
@@ -18,8 +22,9 @@ static void builtin_builtin(const char **argv);
 static void builtin_source(const char **argv);
 static void builtin_exec(const char** argv);
 static void builtin_history(const char** argv);
+static void builtin_exit(const char** argv);
 
-static const char* const builtins_list[] = {"cd", "export", "alias", "unalias", "builtin", "source", "exec", "history"};
+static const char* const builtins_list[] = {"cd", "export", "alias", "unalias", "builtin", "source", "exec", "history", "exit"};
 
 int builtin_id(const char* command){
 	if(!command){
@@ -63,18 +68,29 @@ void exec_builtin_id(int id, const char** argv){
 		case 7:
 			builtin_history(argv);
 			break;
+		case 8:
+			builtin_exit(argv);
+			break;
 		default:
 			printf("Builtin id %d not found.\n", id);
 	}
 }
 
 static void builtin_cd(const char** argv){
+	if(*(argv + 2)){
+		printf("bashanelli: cd: too many arguments\n");
+		return;
+	}
 	if(!*(argv + 1)){
 		chdir(getenv("HOME"));
 	}
 	else if(chdir(*(argv + 1))) {
 		warn("cd: %s", *(argv + 1));
 	}
+	char working_dir[MAX_CWD_LEN];
+	getcwd(working_dir, MAX_CWD_LEN);
+	add_export("PWD", working_dir);
+
 }
 
 static void builtin_export(const char** argv){
@@ -191,6 +207,15 @@ static void builtin_exec(const char** argv){
 }
 
 static void builtin_history(const char** argv){
+	if(*(argv + 1)){
+		if(!strcmp(*(argv+1),"-c") || !strcmp(*(argv+1),"--clear")){
+			clear_history();
+			return;
+		}
+		printf("bashanelli: history: too many arguments\n");
+		return;
+	}
+	
 	char** entries = get_entire_history();
 	if(!entries){
 		return;
@@ -199,4 +224,14 @@ static void builtin_history(const char** argv){
 		printf(" %d\t%s\n", i + 1, *(entries + i));
 	}
 	free(entries);
+}
+
+static void builtin_exit(const char** argv){
+	char* home_directory = getenv(K_HOME_ENV);
+	char* history_filepath = calloc(strlen(home_directory) + strlen(HISTORY_FILE) + 2, sizeof(char));
+	strcpy(history_filepath, home_directory);
+	strcat(history_filepath, "/");
+	strcat(history_filepath, HISTORY_FILE);
+	export_history_to_file(history_filepath);
+	exit(0);
 }
