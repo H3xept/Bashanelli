@@ -9,6 +9,7 @@
 #include <err.h>
 #include <stdint.h>
 #include <assert.h>
+#include <BareBonesReadline/string_utils.h>
 
 #include "parse_commands.h"
 #include "exporting.h"
