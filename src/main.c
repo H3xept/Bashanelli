@@ -1,5 +1,6 @@
 #include <ANSIsACurse/characters.h>
 #include <BareBonesReadline/readline.h>
+#include <BareBonesHistory/history.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,6 +22,10 @@
 int main(int argc, char const *argv[])
 {	
 	char* home_directory = getenv(K_HOME_ENV);
+	char* history_filepath = calloc(strlen(home_directory) + strlen(HISTORY_FILE) + 2, sizeof(char));
+	strcpy(history_filepath, home_directory);
+	strcat(history_filepath, "/");
+	strcat(history_filepath, HISTORY_FILE);
 
 	init_argv();
 	push_argv_frame(argv, argc);
@@ -35,10 +40,10 @@ int main(int argc, char const *argv[])
 
 	int is_done = 0;
 	init_readline(&is_done);
-	if(!file_exists(HISTORY_FILE)){
-		fclose(fopen(HISTORY_FILE, "w"));
+	if(!file_exists(history_filepath)){
+		fclose(fopen(history_filepath, "w"));
 	}
-	import_history_from_file(HISTORY_FILE);
+	import_history_from_file(history_filepath);
 	
 	startup(argc, argv);
 
@@ -54,7 +59,7 @@ int main(int argc, char const *argv[])
 		if(line && *line){
 			free(line);
 		}
-		export_history_to_file(HISTORY_FILE);
+		export_history_to_file(history_filepath);
 	}
 	return 0;
 }
