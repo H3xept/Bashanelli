@@ -97,13 +97,13 @@ The history is stored in `~/.bnli_history`.
 
 ## Builtins
 
-###`cd`
+### `cd`
 Changes the working directory.
 Providing no args changes the working directory to $HOME.
 
 ---
 
-###`export`
+### `export`
 
 Sets an environment variable to a given value.
 
@@ -113,7 +113,7 @@ Sets an environment variable to a given value.
 
 ---
 
-###`unset`
+### `unset`
 
 Unsets the value of a given environment variable.
 
@@ -156,5 +156,3 @@ Executes a given command as an executable program.
 ### `exit`
 
 Quits the shell with exit code 0.
-
----
