@@ -8,6 +8,7 @@
 #include <err.h>
 #include <stdint.h>
 #include <assert.h>
+#include <BareBonesReadline/readline.h>
 
 #include "execute_command.h"
 #include "script_handling.h"
@@ -49,8 +50,12 @@ void execute_command(const char** argv){
 }
 
 void parse_and_execute_command(const char* command){
-	char* parsed_command = parse_line(command);
-	char** argv = parse_command(parse_command);
+	#warning THE WHOLE PROGRAM CRASHES WHEN THIS LINE IS TAKEN AWAY
+	
+	char* parsed_line = parse_line(command);
+	printf("got this far!\n");
+	char** argv = parse_command(parsed_line);
+
 	execute_command((const char**)argv);
 	if(argv ){
 		int i = 0;
@@ -59,7 +64,7 @@ void parse_and_execute_command(const char* command){
 			i++;
 		}
 		free(argv);
-	} free(parsed_command);
+	} free(parsed_line);
 }
 
 void execute_builtin(const char* command, const char** argv){
@@ -83,15 +88,9 @@ void execute_shell_script(const char* filename, const char** argv){
 	while(*(argv + i)){
 		i++;
 	}
-	pid_t pid = fork();
-	if(!pid){
-		push_argv_frame(argv, i);
-		handle_script(filename);
-		exit(0);
-	}
-	else{
-		waitpid(pid, NULL, 0);
-	}
+	push_argv_frame(argv, i);
+	handle_script(filename);
+	pop_argv_frame();
 
 }
 

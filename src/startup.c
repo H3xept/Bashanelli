@@ -7,9 +7,13 @@
 #include "parse_commands.h"
 #include "execute_command.h"
 
+#define BNLI_PROFILE ".bnli_profile"
+#define K_HOME_ENV "HOME"
+
 
 static void load_profile_login();
 static void load_profile_nonlogin();
+static void load_profile_bnli();
 
 void startup(const int argc, const char** argv){
 	int login = **argv == '-';
@@ -35,6 +39,7 @@ void startup(const int argc, const char** argv){
 		else{
 			load_profile_nonlogin();
 		}
+		load_profile_bnli();
 	}
 	
 	if(first_non_flag_arg > 0){
@@ -69,4 +74,15 @@ static void load_profile_nonlogin(){
 	char* cmd = parse_line("~/.bashrc");
 	parse_and_execute_command(cmd);
 	free(cmd);
+}
+
+static void load_profile_bnli(){
+	char* home_directory = getenv(K_HOME_ENV);
+	char* profile_location = calloc(strlen(home_directory) + strlen(BNLI_PROFILE) + 2, sizeof(char));
+	strcpy(profile_location, home_directory);
+	strcat(profile_location, "/");
+	strcat(profile_location, BNLI_PROFILE);
+	char** argv = parse_command(profile_location);
+	execute_shell_script(profile_location, argv);
+	free(profile_location);
 }

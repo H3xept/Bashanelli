@@ -43,7 +43,10 @@ int handle_script(const char *filename) {
 	int c = 0;
 	while(c < lines) {
 		if(*scrlines[c]){
-			parse_and_execute_command(scrlines[c]);	
+			char* line = calloc(strlen(scrlines[c]) + 1, sizeof(char));
+			strcpy(line, scrlines[c]);
+			parse_and_execute_command(line);
+			free(line);	
 		}
 		c++;
 	}
