@@ -14,7 +14,8 @@ An exercise in finding out that bash was way more extensive than we first though
 - Cycling through previous commands (up/down arrows)
 
 <sub>also we implemented our own readline! 👍</sub>
-<sub>we ran out of time to do redirection :(</sub>
+
+<sub>we ran out of time to do redirection... :(</sub>
 
 ---
 
@@ -74,7 +75,7 @@ export PS1="\\033[1m\\033[32m\\u@\\h\\033[0m:\\033[1m\\033[34m\\w\\033[0m\\033[1
 
 With a user "bob" on a machine "myComputer", the PS1 will look as follows:
 
-**<span style="color:green">bob@myComputer</span>:<span style="color:blue">~/Documents</span>>**
+**<span style="color:green">bob@myComputer</span>:<span style="color:blue">~/Documents</span>>**  <sub>please imagine colours here, GitHub supresses CSS text coloring</sub>
 
 ---
 
@@ -116,7 +117,7 @@ Unsets the value of a given environment variable.
 
 ---
 
-###`alias`
+### `alias`
 
 Assigns an alias to a given command.
 
@@ -126,31 +127,31 @@ Assigns an alias to a given command.
 
 ---
 
-###`unalias`
+### `unalias`
 
 Removes a given alias.
 
 ---
 
-###`builtin`
+### `builtin`
 
 Executes a given command as a builtin.
 
 ---
 
-###`source`
+### `source`
 
 Executes a given command as a shell script.
 
 ---
 
-###`exec`
+### `exec`
 
 Executes a given command as an executable program.
 
 ---
 
-###`exit`
+### `exit`
 
 Quits the shell with exit code 0.
 
