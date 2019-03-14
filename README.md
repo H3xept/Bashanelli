@@ -2,6 +2,8 @@
 
 An exercise in finding out that bash was way more extensive than we first thought.
 
+![screenshot](https://user-images.githubusercontent.com/30571778/54396759-fbd67a80-46ab-11e9-9d98-a83ec64d0150.png)
+
 ---
 ## Features
 
