@@ -103,6 +103,16 @@ Providing no args changes the working directory to $HOME.
 
 ---
 
+### `history`
+
+Prints each line in the history along with its assosciated number.
+
+#### Flags
+
+- `-c` / `--clear` - Clears the history.
+
+---
+
 ### `export`
 
 Sets an environment variable to a given value.
