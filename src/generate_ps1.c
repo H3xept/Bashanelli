@@ -7,13 +7,7 @@
 
 #include "exporting.h"
 #include "argv.h"
-
-#define MAX_CWD_LEN 5000
-#define MAX_LOGIN_LEN 5000
-#define MAX_HOSTNAME_LEN 5000
-
-#define K_HOME_ENV "HOME"
-#define PS1_ENV "PS1"
+#include "constants.h"
 
 char* generate_ps1(){
 	char* ps1 = get_export_value(PS1_ENV);
@@ -38,7 +32,7 @@ char* generate_ps1(){
 	char working_dir[MAX_CWD_LEN];
 	getcwd(working_dir, MAX_CWD_LEN);
 
-	char* home_directory = getenv(K_HOME_ENV);
+	char* home_directory = getenv(HOME_ENV);
 	char working_dir_w_tilde[MAX_CWD_LEN];
 	if(strstr(working_dir, home_directory) == working_dir){
 		working_dir_w_tilde[0] = '~';

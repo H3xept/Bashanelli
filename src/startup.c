@@ -6,9 +6,7 @@
 
 #include "parse_commands.h"
 #include "execute_command.h"
-
-#define BNLI_PROFILE ".bnli_profile"
-#define K_HOME_ENV "HOME"
+#include "constants.h"
 
 
 static void load_profile_login();
@@ -86,7 +84,7 @@ static void load_profile_nonlogin(){
 }
 
 static void load_profile_bnli(){
-	char* home_directory = getenv(K_HOME_ENV);
+	char* home_directory = getenv(HOME_ENV);
 	char* profile_location = calloc(strlen(home_directory) + strlen(BNLI_PROFILE) + 2, sizeof(char));
 	strcpy(profile_location, home_directory);
 	strcat(profile_location, "/");

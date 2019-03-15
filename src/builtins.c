@@ -1,106 +1,122 @@
+/**
+ * File: builtins.c
+ *
+ * Description: Contains definitions of builtins used by Bashanelli
+ * Also contains functions that can be called to execute builtins by
+ * name or id.
+ * 
+ * Date: 
+ * 15/3/2019
+ * 
+ * Authors: 
+ *	1. Leonardo Cascianelli (me.leonardocascianelli@gmail.com)
+ *	2. Rory Brown (rorybrown660@gmail.com)
+ *	3. Ewan Skene (ewancskene@gmail.com)
+ * 
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <err.h>
 #include <unistd.h>
+
 #include <BareBonesHistory/history.h>
 
 #include "builtins.h"
 #include "aliasing.h"
 #include "exporting.h"
 #include "execute_command.h"
+#include "constants.h"
 
-#define HISTORY_FILE ".bnli_history"
-#define K_HOME_ENV "HOME"
-#define MAX_CWD_LEN 5000
+#define NUM_BUILTINS 10
 
-static void builtin_cd(const char** argv);
-static void builtin_export(const char **argv);
-static void builtin_unset(const char **argv);
-static void builtin_alias(const char **argv);
-static void builtin_unalias(const char **argv);
-static void builtin_builtin(const char **argv);
-static void builtin_source(const char **argv);
-static void builtin_exec(const char** argv);
-static void builtin_history(const char** argv);
+static int builtin_cd(const char** argv);
+static int builtin_export(const char **argv);
+static int builtin_unset(const char **argv);
+static int builtin_alias(const char **argv);
+static int builtin_unalias(const char **argv);
+static int builtin_builtin(const char **argv);
+static int builtin_source(const char **argv);
+static int builtin_exec(const char** argv);
+static int builtin_history(const char** argv);
 static void builtin_exit(const char** argv);
 
+// List of all builtin names ordered by id
 static const char* const builtins_list[] = {"cd", "export", "unset", "alias", "unalias", "builtin", "source", "exec", "history", "exit"};
 
-int builtin_id(const char* command){
-	if(!command){
+// Retrieves the id associated with a builtin by name
+int builtin_id(const char* name){
+	if(!name){
 		return -1;
 	}
 	for(int i = 0; i < NUM_BUILTINS; i++){
-		if(!strcmp(command,*(builtins_list + i))){
+		if(!strcmp(name,*(builtins_list + i))){
 			return i;
 		}
 	}
 	return -1;
 }
 
-void exec_builtin_str(const char* command, const char** argv){
-	exec_builtin_id(builtin_id(command), argv);
+// Executes a builtin with a given name, passing a given argv
+int exec_builtin_str(const char* name, const char** argv){
+	return exec_builtin_id(builtin_id(name), argv);
 }
 
-void exec_builtin_id(int id, const char** argv){
+// Executes a builtin with a given id, passing a given argv
+int exec_builtin_id(int id, const char** argv){
 	switch(id){
 		case 0:
-			builtin_cd(argv);
-			break;
+			return builtin_cd(argv);
 		case 1:
-			builtin_export(argv);
-			break;
+			return builtin_export(argv);
 		case 2:
-			builtin_unset(argv);
-			break;
+			return builtin_unset(argv);
 		case 3:
-			builtin_alias(argv);
-			break;
+			return builtin_alias(argv);
 		case 4:
-			builtin_unalias(argv);
-			break;
+			return builtin_unalias(argv);
 		case 5:
-			builtin_builtin(argv);
-			break;
+			return builtin_builtin(argv);
 		case 6:
-			builtin_source(argv);
-			break;
+			return builtin_source(argv);
 		case 7:
-			builtin_exec(argv);
-			break;
+			return builtin_exec(argv);
 		case 8:
-			builtin_history(argv);
-			break;
+			return builtin_history(argv);
 		case 9:
 			builtin_exit(argv);
-			break;
 		default:
 			printf("Builtin id %d not found.\n", id);
+			return -1;
 	}
 }
 
-static void builtin_cd(const char** argv){
+// Changes the working directory to the given arg
+// If not second arg is given then the working directory is set to $HOME
+static int builtin_cd(const char** argv){
 	if(*(argv + 2)){
 		printf("bashanelli: cd: too many arguments\n");
-		return;
+		return 1;
 	}
 	if(!*(argv + 1)){
-		chdir(getenv("HOME"));
+		chdir(getenv(HOME_ENV));
 	}
 	else if(chdir(*(argv + 1))) {
 		warn("cd: %s", *(argv + 1));
+		return 1;
 	}
 	char working_dir[MAX_CWD_LEN];
 	getcwd(working_dir, MAX_CWD_LEN);
-	add_export("PWD", working_dir);
-
+	add_export(PWD_ENV, working_dir);
+	return 0;
 }
 
-static void builtin_export(const char** argv){
+// Parses exports from argv in form a=b where a = env var name and b = value
+static int builtin_export(const char** argv){
 	if(!*(argv+1)){
 		print_exportlist();
-		return;
+		return 0;
 	}
 	int i = 1;
 	if(!strcmp(*(argv+i),"-p")){
@@ -119,12 +135,13 @@ static void builtin_export(const char** argv){
 		i++;
 		p = *(argv+i);
 	}
-	return;
+	return 0;
 }
 
-static void builtin_unset(const char **argv){
+// Unsets an env var's value based on name from argv
+static int builtin_unset(const char **argv){
 	if(!*(argv+1)){
-		return;
+		return 1;
 	}
 	int i = 1;
 	const char *p = *(argv+i);
@@ -135,13 +152,13 @@ static void builtin_unset(const char **argv){
 		i++;
 		p = *(argv+i);
 	}
-
+	return 0;
 }
 
-static void builtin_alias(const char** argv){
+static int builtin_alias(const char** argv){
 	if(!*(argv+1)){
 		print_aliaslist();
-		return;
+		return 0;
 	}
 	int i = 1;
 	if(!strcmp(*(argv+i),"-p")){
@@ -165,19 +182,19 @@ static void builtin_alias(const char** argv){
 		i++;
 		p = *(argv+i);
 	}
-	return;
+	return 0;
 }
 
-static void builtin_unalias(const char** argv){
+static int builtin_unalias(const char** argv){
 if(!*(argv+1)){
 		warnx("unalias: usage: unalias [-a] name [name ...]\n");
-		return;
+		return 1;
 	}
 	int i = 1;
 	if(!strcmp(*(argv+i),"-a")){
 		teardown_aliases();
 		init_aliases();
-		return;
+		return 0;
 	}
 	const char *p = *(argv+i);
 	while(p){
@@ -187,67 +204,71 @@ if(!*(argv+1)){
 		i++;
 		p = *(argv+i);
 	}
-	return;
+	return 0;
 }
 
-static void builtin_builtin(const char** argv){
+static int builtin_builtin(const char** argv){
 	if(!*(argv + 1)){
 		printf("builtin: usage: builtin [shell-builtin [args]]\n");
-		return;
+		return 1;
 	}
 	exec_builtin_str(*(argv + 1), argv + 1);
+	return 0;
 }
 
-static void builtin_source(const char** argv){
+static int builtin_source(const char** argv){
 	if(!*(argv + 1)){
 		printf("source: usage: source filename [args]\n");
-		return;
+		return 1;
 	}
 	const char* full_path = file_path(*(argv + 1));
 	if(full_path){
 		execute_shell_script(full_path, argv + 1);
 		free((char*)full_path);
-		return;
+		return 0;
 	}
 	execute_shell_script(*(argv + 1), argv + 1);
+	return 0;
 }
 
-static void builtin_exec(const char** argv){
+static int builtin_exec(const char** argv){
 	if(!*(argv + 1)){
 		printf("exec: usage: exec filename [args]\n");
-		return;
+		return 1;
 	}
 	const char* full_path = file_path(*(argv + 1));
 	if(full_path){
 		execute_bin(full_path, argv + 1);
 		free((char*)full_path);
-		return;
+		return 0;
 	}
 	execute_bin(*(argv + 1), argv + 1);
+	return 0;
 }
 
-static void builtin_history(const char** argv){
+static int builtin_history(const char** argv){
 	if(*(argv + 1)){
 		if(!strcmp(*(argv+1),"-c") || !strcmp(*(argv+1),"--clear")){
 			clear_history();
-			return;
+			return 0;
 		}
 		printf("bashanelli: history: too many arguments\n");
-		return;
+		return 1;
 	}
 	
 	char** entries = get_entire_history();
 	if(!entries){
-		return;
+		return 0;
 	}
 	for(int i = 0; i < entries_n(); i++){
 		printf(" %d\t%s\n", i + 1, *(entries + i));
 	}
 	free(entries);
+	return 0;
 }
 
 static void builtin_exit(const char** argv){
-	char* home_directory = getenv(K_HOME_ENV);
+	char* home_directory = getenv(HOME_ENV);
 	char* history_filepath = calloc(strlen(home_directory) + strlen(HISTORY_FILE) + 2, sizeof(char));
 	strcpy(history_filepath, home_directory);
 	strcat(history_filepath, "/");

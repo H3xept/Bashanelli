@@ -8,8 +8,8 @@
 #include "script_handling.h"
 #include "execute_command.h"
 #include "parse_commands.h"
+#include "constants.h"
 
-#define MAX_CMD_LEN 500
 #define DEFAULT_LINES 50
 
 int handle_script(const char *filename) {
@@ -100,8 +100,8 @@ char *search_path(const char* filename) {
 
 	FILE *fp;
 	char *path, *ret, *tempath;
-	path = malloc((strlen(getenv("PATH"))+1)*sizeof(char));
-	strcpy(path,getenv("PATH"));
+	path = malloc((strlen(getenv(PATH_ENV))+1)*sizeof(char));
+	strcpy(path,getenv(PATH_ENV));
 
 	if(!path)
 		return 0;
