@@ -31,5 +31,6 @@ char** get_current_argv();
 
 // Returns an indexed arg from the current argv frame
 char* get_arg_from_current_argv(const int index);
+unsigned int get_argc_from_current_argv();
 
 #endif
