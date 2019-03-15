@@ -66,6 +66,7 @@ char* generate_ps1(){
 	free(ps1_s);
 	free(ps1_w);
 	free(ps1_bs);
+	if (ps1) free(ps1);
 	
 	return ps1_c;
 }

@@ -131,11 +131,12 @@ void teardown_exports() {
 
 char *get_export_value(const char *name){
 	struct exportlist *e = is_export(name);
+	char *ret = NULL;
 	if(e){
-		char *ret = calloc( strlen(e->val) + 1, sizeof(char) );
+		ret = calloc( strlen(e->val) + 1, sizeof(char) );
 		strcpy(ret, e->val);
 		return ret;
-	}
+	} 
 	return NULL;
 }
 

@@ -84,8 +84,6 @@ char **read_file(const char* filepath, unsigned int *lcount) {
 		}
 		lines[c] = malloc(strlen(tmp)*sizeof(char)+1);
 		strcpy(lines[c],tmp);
-		//REMOVE_NEWLINE(lines[c])
-		//ignore_comment(lines[c]);
 		c++;
 		char *oldtmp = tmp;
 		tmp = 0;
