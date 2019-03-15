@@ -240,7 +240,7 @@ char *expand_exvar(const char *line){
 	//I'm sorry leo. . . don't look, skip the next line, it doesn't exist.
 	Tokenizer* tok = new_tokenizer(ln, ' ');
 	char* current = next_token(tok);
-	while(current){
+	while(current) {
 		dp = strchr(current, '$');
 
 		if(dp && !(strchr(current, '\\') == dp-1)){
@@ -248,9 +248,33 @@ char *expand_exvar(const char *line){
 				strncat(tmp, current, (dp - current));
 			}
 			int arg = (int)strtol(dp + 1, NULL, 10);
-			if(arg || *(dp + 1) == '0'){
+			if(arg || (strlen(dp) == 2 && *(dp + 1) == '0')) {
 				char* indexed_arg = get_arg_from_current_argv(arg);
 				strcat(tmp, indexed_arg);
+			}
+			else if(*(dp + 1) == '#') {
+				unsigned int argc = get_argc_from_current_argv();
+				char argctxt[MAX_CMD_LEN];
+				sprintf(argctxt, "%d", argc);
+				strcat(tmp, argctxt);
+			}
+			else if(*(dp + 1) == '@') {
+				char **argz = get_current_argv();
+				int i = 1;
+				while(argz && *(argz+i)){
+					strcat(tmp, *(argz+i));
+					strcat(tmp, " ");
+					i++;
+				}
+			}
+			else if(*(dp + 1) == '?') {
+				char **argz = get_current_argv();
+				int i = 1;
+				while(argz && *(argz+i)){
+					strcat(tmp, *(argz+i));
+					strcat(tmp, " ");
+					i++;
+				}
 			}
 			else{
 				var = get_export_value(dp+1);
@@ -262,7 +286,12 @@ char *expand_exvar(const char *line){
 				}
 			}
 			// printf(";%x;", arg);
-			
+		}
+		else if((strchr(current, '\\') == dp-1)){
+			if(dp > current){
+				strncat(tmp, current, (dp - current)-1);
+			}
+			strcat(tmp, dp);
 		}
 		else {
 			strcat(tmp, current);
