@@ -86,7 +86,6 @@ void execute_builtin(const char* command, const char** argv){
 }
 
 void execute_shell_script(const char* filename, const char** argv){
-	//printf("Shell script argv support not implemented. Executing without args...\n");
 	if(!filename){
 		printf("No filename given");
 		recent_exit_code = -1;
