@@ -16,6 +16,7 @@
 
 static void builtin_cd(const char** argv);
 static void builtin_export(const char **argv);
+static void builtin_unset(const char **argv);
 static void builtin_alias(const char **argv);
 static void builtin_unalias(const char **argv);
 static void builtin_builtin(const char **argv);
@@ -24,7 +25,7 @@ static void builtin_exec(const char** argv);
 static void builtin_history(const char** argv);
 static void builtin_exit(const char** argv);
 
-static const char* const builtins_list[] = {"cd", "export", "alias", "unalias", "builtin", "source", "exec", "history", "exit"};
+static const char* const builtins_list[] = {"cd", "export", "unset", "alias", "unalias", "builtin", "source", "exec", "history", "exit"};
 
 int builtin_id(const char* command){
 	if(!command){
@@ -51,24 +52,27 @@ void exec_builtin_id(int id, const char** argv){
 			builtin_export(argv);
 			break;
 		case 2:
-			builtin_alias(argv);
+			builtin_unset(argv);
 			break;
 		case 3:
-			builtin_unalias(argv);
+			builtin_alias(argv);
 			break;
 		case 4:
-			builtin_builtin(argv);
+			builtin_unalias(argv);
 			break;
 		case 5:
-			builtin_source(argv);
+			builtin_builtin(argv);
 			break;
 		case 6:
-			builtin_exec(argv);
+			builtin_source(argv);
 			break;
 		case 7:
-			builtin_history(argv);
+			builtin_exec(argv);
 			break;
 		case 8:
+			builtin_history(argv);
+			break;
+		case 9:
 			builtin_exit(argv);
 			break;
 		default:
@@ -116,6 +120,22 @@ static void builtin_export(const char** argv){
 		p = *(argv+i);
 	}
 	return;
+}
+
+static void builtin_unset(const char **argv){
+	if(!*(argv+1)){
+		return;
+	}
+	int i = 1;
+	const char *p = *(argv+i);
+	while(p){
+		if(remove_export(p)) {
+			warnx("unset: %s: was not found", p);
+		}
+		i++;
+		p = *(argv+i);
+	}
+
 }
 
 static void builtin_alias(const char** argv){

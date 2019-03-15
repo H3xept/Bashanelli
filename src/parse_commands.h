@@ -24,7 +24,8 @@ char* trim_whitespace(const char* str);
 //otherwise returns alloced copy of original str
 char *expand_alias(const char *line);
 
-
+//returns alloced line with $x replaced with exported variables
+//returns copy of alloced line if no $s
 char *expand_exvar(const char *line);
 
 

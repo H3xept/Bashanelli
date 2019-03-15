@@ -123,17 +123,3 @@ char *search_path(const char* filename) {
 	free(path);
 	return 0;
 }
-
-int is_script(const char *path){
-	if(file_exists(path)){
-		FILE *fp = fopen(path, "r");
-		char shebang[MAX_CMD_LEN] = {0};
-		fgets(shebang, MAX_CMD_LEN, fp);
-		REMOVE_NEWLINE(shebang)
-		if(shebang[0] == '#' && shebang[1] == '!'){
-			parse_and_execute_command(shebang+2);
-			return 1;
-		}
-	}
-	return 0;
-}

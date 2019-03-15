@@ -1,4 +1,4 @@
-//#include <ANSIsACurse/cursor.h>
+#include <ANSIsACurse/cursor.h>
 #include <BareBonesReadline/readline.h>
 #include <BareBonesReadline/tokenizer.h>
 #include <stdio.h>
@@ -27,7 +27,7 @@ char** parse_command(const char *command) {
 	}
 	char *uncommented = ignore_comment(command);
 	#warning TEMPORARY FIX FOR PARSE_LINE NOT LIKING NULL
-	char** argv;
+	char** argv = 0;
 	if (uncommented){
 		char *export_expanded = expand_exvar(uncommented);
 		char *alias_expanded = expand_alias(export_expanded);
@@ -112,7 +112,7 @@ char *ignore_comment(const char *line) {
 	strcpy(ret, line); 
 	if (comment && *(comment-1) == ' ') {
 		assert(strlen(line)-strlen(comment) > 0);
-		ret = realloc(ret, (strlen(line)-strlen(comment))*sizeof(char));
+		ret = realloc(ret, (strlen(line)-strlen(comment) + 1)*sizeof(char));
 		*(ret+(strlen(line)-strlen(comment))) = '\0';
 	}
 	return ret;
@@ -122,31 +122,33 @@ char** generate_argv(char* command){
 	if(!command || !*command){
 	 	return NULL;
 	}
-	char *line = calloc(strlen(command) + 1,sizeof(char*));
+	char *line = calloc(strlen(command) + 1,sizeof(char));
 	strcpy(line,command);
 	char *arg;
+	char *oldarg;
 	int i = 0;
-	const char* nextarg = NULL;
-	char** argv = calloc(MAX_ARG_AMT, sizeof(char*));
+	const char* nextarg = 0;
+	char** argv = calloc(1, sizeof(char*));
 	arg = get_arg(line,&nextarg);
 	while(arg != NULL) {
 		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
 		strcpy(*(argv + i), arg);
+		oldarg = arg;
 		arg = get_arg(nextarg, &nextarg);
+		free(oldarg);
 	 	i++;
+	 	argv = realloc(argv, (i+1)*sizeof(char*));
 	}
-	*(argv + i) = NULL;
-	argv = realloc(argv,(i+1)*sizeof(char*));
-	if(line){
-		free(line);
-	}
+	free(arg);
+	*(argv + i) = 0;
+	free(line);
 	return argv;
 }
 
 //custom strtok for handling quoted args, ignoring spaces etc.
 static char *get_arg(const char *arg, const char **endptr) {
 	if (!arg || !*arg){
-		// *endptr = NULL;
+		*endptr = NULL;
 		return NULL;
 	}
 
@@ -176,6 +178,7 @@ static char *get_arg(const char *arg, const char **endptr) {
 				}
 				break;
 			case '\0':
+				i--;
 				cont = 0;
 				break;
 			default:
@@ -186,9 +189,11 @@ static char *get_arg(const char *arg, const char **endptr) {
 		i++;
 	}
 	char *ret = (!c) ? NULL : calloc(c + 1,sizeof(char));
-	if(ret){
-		strcpy(ret,temp);
+	if(!ret){
+		*endptr = NULL;
+		return ret;
 	}
+	strcpy(ret,temp);
 	while(arg[i] == ' ') {
 		i++;
 	}
@@ -197,7 +202,7 @@ static char *get_arg(const char *arg, const char **endptr) {
 }
 
 char *expand_alias(const char *line){
-	const char *endptr;
+	const char *endptr = 0;
 	char *alias = get_arg(line, &endptr);
 	char *expanded = resolve_alias(alias);
 	char *ret;
@@ -209,11 +214,15 @@ char *expand_alias(const char *line){
 			strcat(ret," ");
 			strcat(ret, endptr);
 		}
+		free(alias);
+		free(expanded);
 		return ret;
 	}
 	else {
 		ret = calloc(strlen(line)+1, sizeof(char));
 		strcpy(ret, line);
+		free(alias);
+		free(expanded);
 		return ret;
 	}	
 }
@@ -233,7 +242,8 @@ char *expand_exvar(const char *line){
 	char* current = next_token(tok);
 	while(current){
 		dp = strchr(current, '$');
-		if(dp){
+
+		if(dp && !(strchr(current, '\\') == dp-1)){
 			if(dp > current){
 				strncat(tmp, current, (dp - current));
 			}
