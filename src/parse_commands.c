@@ -26,7 +26,7 @@ char** parse_command(const char *command) {
 		return 0;
 	}
 	char *uncommented = ignore_comment(command);
-	#warning TEMPORARY FIX FOR PARSE_LINE NOT LIKING NULL
+
 	char** argv = 0;
 	if (uncommented){
 		char *export_expanded = expand_exvar(uncommented);
