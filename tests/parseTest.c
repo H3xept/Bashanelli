@@ -35,8 +35,8 @@ void test_generate_argv_with_quotes2() {
 	assert_eq_str(*(args+2),"xy z");
 }
 
-void test_generate_argv_with_quotes_and_comment() {
-	char str[] = {  '"',  '"',  'l',  's',  ' ',  'a',  ' ',  'b', ' ',  '#',  'a',  'b',  '\0'  };
+void test_generate_argv_with_comment() {
+	char str[] = { 'l',  's',  ' ',  'a',  ' ',  'b', ' ',  '#',  'a',  'b',  '\0'  };
 	char **args = generate_argv(str);
 	assert_eq_str(*args,"ls");
 	assert_eq_str(*(args+1),"a");

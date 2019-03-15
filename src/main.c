@@ -48,7 +48,12 @@ int main(int argc, char const *argv[])
 		free(ps1);
 		const char** args = (const char**)parse_command(line);
 		execute_command(args);
-		if(args && *args){
+		if(args){
+			int i = 0;
+			while(*(args+i)) {
+				free(*(args+i));
+				i++;
+			}
 			free(args);
 		}
 		if(line && *line){

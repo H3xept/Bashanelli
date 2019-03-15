@@ -45,8 +45,17 @@ void startup(const int argc, const char** argv){
 	if(first_non_flag_arg > 0){
 		char* cmd = parse_line(argv[first_non_flag_arg]);
 		// parse_and_execute_command(cmd);
-		execute_shell_script(cmd, (const char**)parse_command(cmd));
+		char **argv = (const char**)parse_command(cmd);
+		execute_shell_script(cmd, argv);
 		free(cmd);
+		if(argv){
+			int i = 0;
+			while(*(argv+i)) {
+				free(*(argv+i));
+				i++;
+			}
+			free(argv);
+		}
 	}
 }
 
@@ -84,5 +93,13 @@ static void load_profile_bnli(){
 	strcat(profile_location, BNLI_PROFILE);
 	char** argv = parse_command(profile_location);
 	execute_shell_script(profile_location, argv);
+	if(argv){
+		int i = 0;
+		while(*(argv+i)) {
+			free(*(argv+i));
+			i++;
+		}
+		free(argv);
+	}
 	free(profile_location);
 }

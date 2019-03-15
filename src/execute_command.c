@@ -53,14 +53,15 @@ void parse_and_execute_command(const char* command){
 	char* parsed_line = parse_line(command);
 	char** argv = parse_command(parsed_line);
 	execute_command((const char**)argv);
-	if(argv ){
+	if(argv){
 		int i = 0;
 		while(*(argv+i)) {
 			free(*(argv+i));
 			i++;
 		}
 		free(argv);
-	} free(parsed_line);
+	}
+	free(parsed_line);
 }
 
 void execute_builtin(const char* command, const char** argv){
