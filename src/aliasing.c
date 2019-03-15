@@ -161,9 +161,9 @@ void teardown_aliases() {
 }
 
 static struct aliaslist *generate_alias_item(const char *command, const char *alias) {
-	char *c = calloc(strlen(command),sizeof(char));
+	char *c = calloc(strlen(command) + 1,sizeof(char));
 	strcpy(c,command);
-	char *a = calloc(strlen(alias),sizeof(char));
+	char *a = calloc(strlen(alias) + 1,sizeof(char));
 	strcpy(a,alias);
 	struct aliaslist *new = calloc(1,sizeof(struct aliaslist));
 	new->com = c;
