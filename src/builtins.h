@@ -22,9 +22,9 @@
 int builtin_id(const char* name);
 
 // Executes a builtin with a given name, passing a given argv
-void exec_builtin_str(const char* name, const char** argv);
+int exec_builtin_str(const char* name, const char** argv);
 
 // Executes a builtin with a given id, passing a given argv
-void exec_builtin_id(const int id, const char** argv);
+int exec_builtin_id(const int id, const char** argv);
 
 #endif

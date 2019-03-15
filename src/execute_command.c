@@ -27,6 +27,8 @@
 #define SIGNATURE_ELF 0x7f454c46
 #define SIGNATURE_ELF_REVERSE 0x464c457f
 
+static int recent_exit_code = 0;
+
 void execute_command(const char** argv){
 	if(!argv || !*argv){
 		return;
@@ -80,20 +82,24 @@ void parse_and_execute_command(const char* command){
 }
 
 void execute_builtin(const char* command, const char** argv){
-	exec_builtin_str(command, argv);
+	recent_exit_code = exec_builtin_str(command, argv);
 }
 
 void execute_shell_script(const char* filename, const char** argv){
 	//printf("Shell script argv support not implemented. Executing without args...\n");
 	if(!filename){
+		printf("No filename given", filename);
+		recent_exit_code = -1;
 		return;
 	}
 	if(!file_exists(filename)){
 		printf("No such file: %s\n", filename);
+		recent_exit_code = -1;
 		return;
 	}
 	if(is_executable(filename)){
 		printf("Cannot run executable file as script: %s\n", filename);
+		recent_exit_code = -1;
 		return;
 	}
 	int i = 0;
@@ -109,7 +115,8 @@ void execute_shell_script(const char* filename, const char** argv){
 void execute_bin(const char* filename, const char** argv) {
 	pid_t pid = fork();
 	if(!pid){
-		if(execvp(filename, ((char* const *)argv)) == -1){
+		recent_exit_code = execvp(filename, ((char* const *)argv));
+		if(recent_exit_code == -1){
 			printf("%s: command not found\n", filename);
 			fflush(stdout);
 		};
@@ -154,6 +161,10 @@ int is_dir(const char* path){
 	struct stat st;
 	stat(path, &st);
 	return !S_ISREG(st.st_mode);
+}
+
+int get_exit_code(){
+	return recent_exit_code;
 }
 
 // Returns the full path of a file present in a directory specified by the PATH env variable.

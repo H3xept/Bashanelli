@@ -22,4 +22,6 @@ int file_exists(const char* filename);
 const char* file_path(const char* filename);
 int is_dir(const char* path);
 
+int get_exit_code();
+
 #endif
