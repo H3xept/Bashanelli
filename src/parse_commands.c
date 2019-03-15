@@ -1,6 +1,3 @@
-#include <ANSIsACurse/cursor.h>
-#include <BareBonesReadline/readline.h>
-#include <BareBonesReadline/tokenizer.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,14 +6,17 @@
 #include <err.h>
 #include <stdint.h>
 #include <assert.h>
+#include <ANSIsACurse/cursor.h>
+#include <BareBonesReadline/readline.h>
+#include <BareBonesReadline/tokenizer.h>
 #include <BareBonesReadline/string_utils.h>
 
 #include "parse_commands.h"
 #include "exporting.h"
 #include "aliasing.h"
 #include "argv.h"
+#include "constants.h"
 
-#define MAX_CMD_LEN 10000
 #define MAX_ARG_AMT 50
 
 static char *get_arg(const char *arg, const char **endptr);
@@ -44,23 +44,6 @@ char** parse_command(const char *command) {
 
 	return argv;
 }
-
-// char **seperate_into_commands(const char *command) {
-// 		if(!*command){
-// 		return NULL;
-// 	}
-// 	int argc = count_occ(command, ' ') + 1; //multiple spaces between args?
-// 	char** argv = calloc(argc + 1, sizeof(char*));
-// 	char* arg = strtok(command, " ");
-// 	for(int i = 0; i < argc; i++){
-// 		*(argv + i) = calloc(strlen(arg) + 1, sizeof(char));
-// 		strcpy(*(argv + i), arg);
-// 		arg = strtok(NULL, " ");
-// 	}
-// 	*(argv + argc) = NULL;
-// 	int i = 1;
-// 	return argv;
-// }
 
 int count_occ(const char* str, const char c){
 	int occurences = 0;

@@ -1,3 +1,18 @@
+/**
+ * File: aliasing.c
+ *
+ * Description: Handles command aliasing
+ * 
+ * Date: 
+ * 15/3/2019
+ * 
+ * Authors: 
+ *	1. Leonardo Cascianelli (me.leonardocascianelli@gmail.com)
+ *	2. Rory Brown (rorybrown660@gmail.com)
+ *	3. Ewan Skene (ewancskene@gmail.com)
+ * 
+ */
+
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
@@ -9,33 +24,37 @@
 
 #include "aliasing.h"
 
-static struct aliaslist *generate_alias_item(const char *command, const char *alias);
-static struct aliaslist *is_alias(const char *alias);
-static int srec(char **hist, char *alias);
+static struct alias_entry *generate_alias_item(const char *command, const char *alias);
+static struct alias_entry *get_alias_entry(const char *alias);
+static int sa_contains(char **string_array, char *search_string);
 
-struct aliaslist{
+struct alias_entry{
 	char *com;
 	char *ali;
-	struct aliaslist *next;
+	struct alias_entry *next;
 };
 
-static struct aliaslist *head = NULL;
-static struct aliaslist *tail = NULL; 
+static struct alias_entry *head = NULL;
+static struct alias_entry *tail = NULL; 
 static unsigned int length = 0;
 
+// inits alias variables
 void init_aliases() {
 	head = NULL;
 	tail = NULL;
 	length = 0;
 }
 
+// gets number of aliases set
 int get_aliaslist_length(){
 	return length;
 }
 
+// set new alias
+// e.g alias [alias]=[command]
 void add_alias(const char *alias, const char *command) {
-	struct aliaslist *new = generate_alias_item(command, alias);
-	struct aliaslist *existing = is_alias(alias);
+	struct alias_entry *new = generate_alias_item(command, alias);
+	struct alias_entry *existing = get_alias_entry(alias);
 	if(!tail){
 		tail = new;
 		head = new;
@@ -59,11 +78,12 @@ void add_alias(const char *alias, const char *command) {
 	}
 }
 
+// remove alias from list
 int remove_alias(const char *alias) {
 	if (length == 0) {
 		return 1;
 	}
-	struct aliaslist *current = tail;
+	struct alias_entry *current = tail;
 	if(!strcmp(current->ali, alias)){
 		tail = current->next;
 		free(current->ali);
@@ -74,7 +94,7 @@ int remove_alias(const char *alias) {
 	}
 	while(current->next) {
 		if(!strcmp(current->next->ali,alias)){
-			struct aliaslist *temp = current->next->next;
+			struct alias_entry *temp = current->next->next;
 			free(current->next->ali);
 			free(current->next->com);
 			free(current->next);
@@ -87,19 +107,25 @@ int remove_alias(const char *alias) {
 	return 1;
 }
 
+// prints a list of all alias and direct translations
+// e.g. given 'a=b' 'b=c' 'c=a'
+// out: alias a = 'b' \n ... etc
 void print_aliaslist(){
 	if(!tail){
 		printf("No aliases found\n");
 	}
-	struct aliaslist *current = tail;
+	struct alias_entry *current = tail;
 	while(current){
 		printf("alias %s = '%s'\n",current->ali,current->com);
 		current = current->next;
 	}
 }
 
+// prints direct translation of alias
+// e.g. given 'a=b' 'b=c' 'c=a'
+// prints alias a = 'b'
 int print_alias(const char *alias) {
-	struct aliaslist *tmp = is_alias(alias);
+	struct alias_entry *tmp = get_alias_entry(alias);
 	char *command = NULL;
 	if(tmp){
 		command = tmp->com;		
@@ -113,7 +139,10 @@ int print_alias(const char *alias) {
 	}
 }
 
-
+// gets the true value of an alias after recursing
+// (terminates if loop detected)
+// e.g. given 'a=b' 'b=c' 'c=a'
+// when input alias is 'a', return would be 'a'
 char *resolve_alias(char *alias) {
 	if(!alias || !*alias){
 		return NULL;
@@ -121,9 +150,9 @@ char *resolve_alias(char *alias) {
 	char **hist = calloc(1,sizeof(char*));
 	size_t r = 0;
 	char *ret = NULL;
-	struct aliaslist *current = is_alias(alias);
+	struct alias_entry *current = get_alias_entry(alias);
 	while(current) {
-		if (srec(hist, current->ali)) {//checknull
+		if (sa_contains(hist, current->ali)) {//checknull
 			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
 			strcpy(ret, current->ali);
 			return ret;
@@ -136,7 +165,7 @@ char *resolve_alias(char *alias) {
 			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
 			strcpy(ret, current->com);
 		}
-		current = is_alias(current->com);
+		current = get_alias_entry(current->com);
 	}
 	if (hist) {
 		free(hist);		
@@ -144,13 +173,14 @@ char *resolve_alias(char *alias) {
 	return ret;
 }
 
+// clear and free all aliases
 void teardown_aliases() {
 	if (length == 0) {
 		return;
 	}
-	struct aliaslist *current = tail;
+	struct alias_entry *current = tail;
 	while(current) {
-			struct aliaslist *temp = current->next;
+			struct alias_entry *temp = current->next;
 			free(current);
 			current = temp;
 			length--;
@@ -160,23 +190,26 @@ void teardown_aliases() {
 	return;
 }
 
-static struct aliaslist *generate_alias_item(const char *command, const char *alias) {
+// Allocs sting space for alias list item
+static struct alias_entry *generate_alias_item(const char *command, const char *alias) {
 	char *c = calloc(strlen(command) + 1,sizeof(char));
 	strcpy(c,command);
 	char *a = calloc(strlen(alias) + 1,sizeof(char));
 	strcpy(a,alias);
-	struct aliaslist *new = calloc(1,sizeof(struct aliaslist));
+	struct alias_entry *new = calloc(1,sizeof(struct alias_entry));
 	new->com = c;
 	new->ali = a;
 	new->next = NULL;
 	return new;
 }
 
-static struct aliaslist *is_alias(const char *alias){
+// Returns an entry specified by name via string alias
+// Returns NULL if no entry is found
+static struct alias_entry *get_alias_entry(const char *alias){
 	if(!alias){
 		return NULL;
 	}
-	struct aliaslist *current = tail;
+	struct alias_entry *current = tail;
 	while(current){
 		if (!strcmp(current->ali,alias)){
 			return current;
@@ -186,10 +219,11 @@ static struct aliaslist *is_alias(const char *alias){
 	return NULL;
 }
 
-static int srec(char **hist, char *alias){
+// Returns true if search_string exists inside string_array
+static int sa_contains(char **string_array, char *search_string){
 	int i = 0;
-	while(*(hist+i)) {
-		if(!strcmp(*(hist+i),alias)){
+	while(*(string_array+i)) {
+		if(!strcmp(*(string_array+i),search_string)){
 			return 1;
 		}
 		i++;

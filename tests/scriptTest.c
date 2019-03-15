@@ -74,13 +74,6 @@ void test_read_in_current_dir() {
 	assert_true(c > 0);
 }
 
-void test_read_in_parent_dir() {
-	int c;
-	read_file("../Makefile",&c);
-	assert_true(c > 0);
-}
-
-
 void teardown(){
 	return;
 }
