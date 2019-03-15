@@ -111,7 +111,7 @@ char *ignore_comment(const char *line) {
 	strcpy(ret, line); 
 	if (comment && *(comment-1) == ' ') {
 		assert(strlen(line)-strlen(comment) > 0);
-		ret = realloc(ret, (strlen(line)-strlen(comment))*sizeof(char));
+		ret = realloc(ret, (strlen(line)-strlen(comment) + 1)*sizeof(char));
 		*(ret+(strlen(line)-strlen(comment))) = '\0';
 	}
 	return ret;
