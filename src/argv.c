@@ -88,3 +88,7 @@ char* get_arg_from_current_argv(const int index){
 	}
 	return *(end->argv + index);
 }
+
+unsigned int get_argc_from_current_argv() {
+	return length;
+}
