@@ -32,6 +32,18 @@
 #include "argv.h"
 #include "constants.h"
 
+#define die(MSG,ERR) { if (MSG) { puts(MSG); } exit(ERR); }
+#define true_or_die(COND, MSG, ERR) { if(!(COND)) die(MSG, ERR); }
+
+static void free_args(char** args) {
+	if(!args) return;
+	int i = 0;
+	while(*(args+i)) {
+		free((char*)*(args+i));
+		i++;
+	} free(args);
+}
+
 // Initialises the shell and runs the main loop, getting input, parsing and executing commands.
 int main(int argc, char const *argv[])
 {	
@@ -41,25 +53,23 @@ int main(int argc, char const *argv[])
 	strcat(history_filepath, "/");
 	strcat(history_filepath, HISTORY_FILE);
 
+	int is_done = 0;
+
+	init_readline(&is_done);
 	init_argv();
-	push_argv_frame(argv, argc);
-
-	if (chdir(home_directory) != 0) {
-		printf("Could not change to home directory!");
-		exit(-1);
-	}
-
 	init_aliases();
 	init_exports();
 
-	add_export(PWD_ENV, home_directory);
+	push_argv_frame(argv, argc);
 
-	int is_done = 0;
-	init_readline(&is_done);
+	true_or_die(chdir(home_directory), "Could not change to home directory!", -1);
+
+	add_export(PWD_ENV, home_directory);
 
 	if(!file_exists(history_filepath)){
 		fclose(fopen(history_filepath, "w"));
 	}
+
 	import_history_from_file(history_filepath);
 	
 	startup(argc, argv);
@@ -67,25 +77,16 @@ int main(int argc, char const *argv[])
 	while(!is_done) {
 		char* ps1 = generate_ps1();
 		char* line = read_line(ps1);
-		free(ps1);
 
 		const char** args = (const char**) parse_command(line);
 		execute_command(args);
 
-		if(args){
-			int i = 0;
-			while(*(args+i)) {
-				free((char*)*(args+i));
-				i++;
-			}
-			free(args);
-		}
-
-		if(line && *line){
-			free(line);
-		}
+		free_args((char**)args);
 
 		export_history_to_file(history_filepath);
+		
+		if(line) free(line);
+		free(ps1);
 	}
 
 	return 0;
