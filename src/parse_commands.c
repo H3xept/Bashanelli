@@ -16,6 +16,7 @@
 #include "aliasing.h"
 #include "argv.h"
 #include "constants.h"
+#include "execute_command.h"
 
 #define MAX_ARG_AMT 50
 
@@ -251,13 +252,10 @@ char *expand_exvar(const char *line){
 				}
 			}
 			else if(*(dp + 1) == '?') {
-				char **argz = get_current_argv();
-				int i = 1;
-				while(argz && *(argz+i)){
-					strcat(tmp, *(argz+i));
-					strcat(tmp, " ");
-					i++;
-				}
+				unsigned int exitstat = get_exit_code();
+				char exitstattxt[MAX_CMD_LEN];
+				sprintf(exitstattxt, "%d", exitstat);
+				strcat(tmp, exitstattxt);
 			}
 			else{
 				var = get_export_value(dp+1);
