@@ -42,17 +42,16 @@ void startup(const int argc, const char** argv){
 	
 	if(first_non_flag_arg > 0){
 		char* cmd = parse_line(argv[first_non_flag_arg]);
-		// parse_and_execute_command(cmd);
-		const char **argv = (const char**)parse_command(cmd);
-		execute_shell_script(cmd, argv);
+		char **argz = (const char**)parse_command(cmd);
+		execute_shell_script(cmd, argz);
 		free(cmd);
-		if(argv){
+		if(argz){
 			int i = 0;
-			while(*(argv+i)) {
-				free((char*)*(argv+i));
+			while(*(argz+i)) {
+				free(*(argz+i));
 				i++;
 			}
-			free(argv);
+			free(argz);
 		}
 	}
 }
