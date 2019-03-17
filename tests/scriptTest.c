@@ -11,7 +11,7 @@ void setup(){
 void test_read_empty_file(){
 	FILE *fp = fopen("loltest","w");
 	fclose(fp);
-	int c;
+	unsigned int c;
 	read_file("loltest",&c);
 	assert_eq_int(c,0);
 	remove("loltest");
@@ -23,7 +23,7 @@ void test_read_five_lines(){
 		fputs("lol\n",fp);
 	}
 	fclose(fp);
-	int c;
+	unsigned int c;
 	read_file("loltest",&c);
 	remove("loltest");
 	assert_true(c == 5);
@@ -44,7 +44,7 @@ void test_read_file_in_path() {
 	unsigned int count;
 	char *filepath = search_path("ls");
 	read_file(filepath,&count);
-	assert_true(count > 200);
+	assert_true(count > 0);
 }
 
 void test_run_script_ls() {
@@ -69,7 +69,7 @@ void test_run_script_ls_with_comments() {
 }
 
 void test_read_in_current_dir() {
-	int c;
+	unsigned int c;
 	read_file("./README.md",&c);
 	assert_true(c > 0);
 }

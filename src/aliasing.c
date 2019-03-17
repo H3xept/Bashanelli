@@ -162,13 +162,15 @@ char *resolve_alias(char *alias) {
 			strcpy(*(hist+r),current->ali);
 			r++;
 			hist = realloc(hist, (r+1)*sizeof(char*)); //keep null terminated
-			ret = realloc(ret, (strlen(current->ali)+1)*sizeof(char));
+			memset(hist+r, 0x0, sizeof(char*));
+			ret = realloc(ret, (strlen(current->com)+1)*sizeof(char));
 			strcpy(ret, current->com);
 		}
 		current = get_alias_entry(current->com);
 	}
 	if (hist) {
-		free(hist);		
+		free(hist);	
+		hist = 0;	
 	}
 	return ret;
 }
@@ -221,6 +223,8 @@ static struct alias_entry *get_alias_entry(const char *alias){
 
 // Returns true if search_string exists inside string_array
 static int sa_contains(char **string_array, char *search_string){
+	assert(search_string && *search_string);
+
 	int i = 0;
 	while(*(string_array+i)) {
 		if(!strcmp(*(string_array+i),search_string)){

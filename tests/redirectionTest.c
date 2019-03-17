@@ -16,18 +16,12 @@ void testFirstPass() {
 }
 
 void testSyntaxCheck1() {
-	char* test = "pofwefoewpofk <> wpeifpweif"
-	assert_null(redirection_parse_command())
+	// <> is not a valid redirection symbol
+	char* test = "pofwefoewpofk <> wpeifpweif";
+	// assert_null(redirection_parse_command())
 }
 
 void testSyntaxCheck2() {
-	char* test = "pofwefoewpofk << wpeifpweif"
-}
-
-void testSyntaxCheck3() {
-	char* test = ""
-}
-
-void testSyntaxCheck4() {
-	char* test = ""
+	// << is not a valid redirection symbol
+	char* test = "pofwefoewpofk << wpeifpweif";
 }
