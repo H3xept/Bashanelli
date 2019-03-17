@@ -44,9 +44,14 @@ static void free_args(char** args) {
 	} free(args);
 }
 
+static void teardown(){
+	teardown_readline();
+}
+
 // Initialises the shell and runs the main loop, getting input, parsing and executing commands.
 int main(int argc, char const *argv[])
 {	
+	atexit(teardown);
 	char* home_directory = getenv(HOME_ENV);
 	char* history_filepath = calloc(strlen(home_directory) + strlen(HISTORY_FILE) + 2, sizeof(char));
 	strcpy(history_filepath, home_directory);
@@ -62,7 +67,7 @@ int main(int argc, char const *argv[])
 
 	push_argv_frame(argv, argc);
 
-	true_or_die(chdir(home_directory), "Could not change to home directory!", -1);
+	true_or_die(!chdir(home_directory), "Could not change to home directory!", -1);
 
 	add_export(PWD_ENV, home_directory);
 

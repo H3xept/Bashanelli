@@ -41,9 +41,9 @@ void startup(const int argc, const char** argv){
 	}
 	
 	if(first_non_flag_arg > 0){
-		char* cmd = parse_line(argv[first_non_flag_arg]);
-		char **argz = (const char**)parse_command(cmd);
-		execute_shell_script(cmd, argz);
+		char* cmd = parse_line((char*) argv[first_non_flag_arg]);
+		char** argz = parse_command(cmd);
+		execute_shell_script(cmd,(const char**) argz);
 		free(cmd);
 		if(argz){
 			int i = 0;
@@ -57,7 +57,7 @@ void startup(const int argc, const char** argv){
 }
 
 static void load_profile_login(){
-	#warning Profile loading disabled.
+	#pragma message("Profile loading disabled.")
 	return;
 	parse_and_execute_command("/etc/profile");
 	char* cmd = parse_line("~/.bash_profile");
@@ -75,6 +75,7 @@ static void load_profile_login(){
 }
 
 static void load_profile_nonlogin(){
+	#pragma message("Profile loading disabled.")
 	return;
 	parse_and_execute_command("/etc/bash.bashrc");
 	char* cmd = parse_line("~/.bashrc");
@@ -83,6 +84,7 @@ static void load_profile_nonlogin(){
 }
 
 static void load_profile_bnli(){
+	return;
 	char* home_directory = getenv(HOME_ENV);
 	char* profile_location = calloc(strlen(home_directory) + strlen(BNLI_PROFILE) + 2, sizeof(char));
 	strcpy(profile_location, home_directory);
