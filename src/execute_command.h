@@ -17,9 +17,13 @@ void execute_shell_script(const char* filename, const char** argv);
 void execute_bin(const char* filename, const char** argv);
 
 int is_builtin(const char* command);
+
 int is_executable(const char* filename);
+
 int file_exists(const char* filename);
+
 const char* file_path(const char* filename);
+
 int is_dir(const char* path);
 
 int get_exit_code();

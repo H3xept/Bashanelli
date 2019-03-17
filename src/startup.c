@@ -84,7 +84,6 @@ static void load_profile_nonlogin(){
 }
 
 static void load_profile_bnli(){
-	return;
 	char* home_directory = getenv(HOME_ENV);
 	char* profile_location = calloc(strlen(home_directory) + strlen(BNLI_PROFILE) + 2, sizeof(char));
 	strcpy(profile_location, home_directory);

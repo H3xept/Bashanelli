@@ -1,5 +1,5 @@
-#ifndef SCRIPT_HANDLING
-#define SCRIPT_HANDLING
+#ifndef __SCRIPT_HANDLING__
+#define __SCRIPT_HANDLING__
 
 #define REMOVE_NEWLINE(x)	{if (x[strlen(x)-1] == '\n') x[strlen(x)-1] = '\0';}
 
@@ -15,4 +15,5 @@ char **read_file(const char* filepath, unsigned int *lcount);
 //calls read_file to get argv 
 //then calls parse_and_execute_command on each line delimited by newline
 int handle_script(const char *filename);
+
 #endif

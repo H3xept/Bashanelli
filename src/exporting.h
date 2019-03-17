@@ -1,5 +1,5 @@
-#ifndef _EXPORTING_
-#define _EXPORTING_
+#ifndef __EXPORTING__
+#define __EXPORTING__
 
 void init_exports();
 

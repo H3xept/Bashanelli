@@ -1,5 +1,5 @@
-#ifndef PARSE_COMMANDS
-#define PARSE_COMMANDS
+#ifndef __PARSE_COMMANDS__
+#define __PARSE_COMMANDS__
 
 //gets single command, trims outer whitespace, ignores line after #, returns alloced argv.
 char** parse_command(const char *command);
