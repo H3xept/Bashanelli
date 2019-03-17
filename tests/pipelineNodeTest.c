@@ -11,21 +11,21 @@ void teardown() {
 }
 
 void testCreate() {
-	PipelineNode* head = pn_new("echo Hello", NULL, NULL);
+	PipelineNode* head = pn_new("echo Hello", NULL, NULL, 0);
 	assert_not_null(head);
 }
 
 void testAdd() {
-	PipelineNode* head = pn_new("echo Hello", NULL, NULL);
-	PipelineNode* next = pn_new("cat file", NULL, NULL);
+	PipelineNode* head = pn_new("echo Hello", NULL, NULL, 0);
+	PipelineNode* next = pn_new("cat file", NULL, NULL, 0);
 	pn_add(head, next);
 	assert_not_null(head->next);
 }
 
 void testAppend() {
-	PipelineNode* head = pn_new("echo Hello", NULL, NULL);
-	PipelineNode* next = pn_new("cat file", NULL, NULL);
-	PipelineNode* next2 = pn_new("cat file2", NULL, NULL);
+	PipelineNode* head = pn_new("echo Hello", NULL, NULL, 0);
+	PipelineNode* next = pn_new("cat file", NULL, NULL, 0);
+	PipelineNode* next2 = pn_new("cat file2", NULL, NULL, 0);
 	pn_append(head, next);
 	pn_append(head, next2);
 	assert_not_null(head->next);
@@ -35,6 +35,6 @@ void testAppend() {
 }
 
 void testDestroy() {
-	PipelineNode* head = pn_new("echo Hello", NULL, NULL);
+	PipelineNode* head = pn_new("echo Hello", NULL, NULL, 0);
 	pn_destroy(head);
 }

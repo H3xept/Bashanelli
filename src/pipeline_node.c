@@ -4,12 +4,13 @@
 
 #include "pipeline_node.h"
 
-PipelineNode* pn_new(char* cmd, char* in, char* out) {
+PipelineNode* pn_new(char* cmd, char* in, char* out, OutMode omode) {
 	assert(cmd);
 
 	PipelineNode* pn = calloc(1, sizeof(PipelineNode));
 	pn->cmd = calloc(strlen(cmd)+1, sizeof(char));
-
+	strcpy(pn->cmd, cmd);
+	
 	if (in){
 		pn->in = calloc(strlen(in)+1, sizeof(char));
 		strcpy(pn->in, in);
@@ -24,6 +25,7 @@ PipelineNode* pn_new(char* cmd, char* in, char* out) {
 		pn->out = NULL;
 	}
 
+	pn->omode = omode;
 	pn->next = NULL;
 
 	return pn;

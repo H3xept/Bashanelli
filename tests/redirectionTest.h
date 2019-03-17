@@ -18,6 +18,12 @@ void testSyntaxCheck13();
 void testSyntaxCheck14();
 void testSyntaxCheck15();
 void testFirstPass();
+void testGetInFilename();
+void testGetOutFilename();
+void testGetOutFilename2();
+void testGetCommand();
+void testCreatePipeline();
+void testCreatePipelines();
 void teardown();
 
 #endif
