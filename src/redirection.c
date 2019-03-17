@@ -4,10 +4,13 @@
 #include <string.h>
 
 #include "redirection.h"
+#include "pipeline_node.h"
 
 #define REDIR_RIGHT '>'
 #define REDIR_LEFT '<'
 #define REDIR_PIPE '|'
+
+// Syntax check
 
 static char redir_symbols[] = {REDIR_RIGHT, REDIR_LEFT, REDIR_PIPE, '\0'};
 
@@ -71,3 +74,5 @@ int redirection_syntax_check(const char* const command) {
 	} 
 	return ret;
 }
+
+// END Syntax check
