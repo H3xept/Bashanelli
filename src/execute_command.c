@@ -67,7 +67,7 @@ void execute_command(const char** argv){
 }
 
 void parse_and_execute_command(const char* command){
-	const char* parsed_line = parse_line(command);
+	const char* parsed_line = parse_line((char*) command);
 	char** argv = parse_command(parsed_line);
 	execute_command((const char**)argv);
 	if(argv){
@@ -105,9 +105,16 @@ void execute_shell_script(const char* filename, const char** argv){
 	while(*(argv + i)){
 		i++;
 	}
-	push_argv_frame(argv, i);
-	handle_script(filename);
-	pop_argv_frame();
+	pid_t pid = vfork();
+	if(!pid){
+		push_argv_frame(argv, i);
+		handle_script(filename);
+		pop_argv_frame();
+		exit(0);
+	}
+	else{
+		waitpid(pid, NULL, 0);
+	}
 
 }
 
@@ -116,7 +123,7 @@ void execute_bin(const char* filename, const char** argv) {
 	if(!pid){
 		recent_exit_code = execvp(filename, ((char* const *)argv));
 		if(recent_exit_code == -1){
-			printf("%s: command not found\n", filename);
+			printf("%s: program not found\n", filename);
 			fflush(stdout);
 		};
 		exit(0);

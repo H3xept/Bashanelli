@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall --pedantic --std=c99
+CFLAGS = -Wall --pedantic
 SOURCE_FOLDER = src
 OUT_FOLDER = bin
 DEPENDENCIES_FOLDER = dependencies
