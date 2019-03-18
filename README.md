@@ -1,4 +1,5 @@
 # Bashanelli (`bnli`)
+![CircleCI](https://circleci.com/gh/H3xept/Bashanelli.svg?style=svg&circle-token=a72575ed04ca889ca7f6f3da53328a054b90718e)
 
 This project was a joint project - Credits to [@Leo](https://twitter.com/H3xept) [@RoryBrownie](https://twitter.com/rory660) [@SkeneLord](https://twitter.com/EwanCSkene)
 
