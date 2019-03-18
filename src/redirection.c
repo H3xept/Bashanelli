@@ -221,9 +221,12 @@ PipelineNode** rd_parse_command(int* nodes_n, const char* const command) {
 	for (int i = 0; i < strlen(command); i++) {
 		if (i[command] == ';' || i == (strlen(command)-1)) {
 			int subcmd_len = (int)((command+i)-last)+1;
-
 			subcmd = calloc(subcmd_len+1, sizeof(char));
 			strncpy(subcmd, last, subcmd_len);
+			
+			for (int k = 0; k < strlen(subcmd); ++k) 
+				if (k[subcmd] == ';') { subcmd[k] = '\0'; break; }
+
 			PipelineNode* node = create_pipeline(subcmd);
 			*(pipelines_array+j) = node;
 			j++;
