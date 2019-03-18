@@ -10,14 +10,13 @@ An exercise in finding out that bash was way more extensive than we first though
 - External program support
 - Shell script support
 - A bunch of builtins
+- Redirection
 - Profile loading
 - Custom PS1
 - History
 - Cycling through previous commands (up/down arrows)
 
 <sub>also we implemented our own readline! 👍</sub>
-
-<sub>we ran out of time to do redirection... :(</sub>
 
 ---
 
@@ -142,6 +141,10 @@ Assigns an alias to a given command.
 ### `unalias`
 
 Removes a given alias.
+
+#### Flags
+
+- `-a` - Removes all aliases.
 
 ---
 

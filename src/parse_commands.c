@@ -17,41 +17,41 @@
 #include "argv.h"
 #include "constants.h"
 #include "execute_command.h"
+#include "redirection.h"
 
 #define MAX_ARG_AMT 50
 
 static char *get_arg(const char *arg, const char **endptr);
 
-char** parse_command(const char *command) {
+PipelineNode** parse_command(int* pipelines_n, const char *command) {
 	if(!command || !*command){
 		return 0;
 	}
 	char *uncommented = ignore_comment(command);
 
-	char** argv = 0;
+	PipelineNode** pipeline_array = 0;
 	if (uncommented){
 		char *export_expanded = expand_exvar(uncommented);
 		char *alias_expanded = expand_alias(export_expanded);
 		char* cmd_whitespace = trim_whitespace(alias_expanded);
-		argv = generate_argv(cmd_whitespace);
+		pipeline_array = rd_parse_command(pipelines_n, cmd_whitespace);
+
 		free(uncommented);
 		free(export_expanded);	
 		free(alias_expanded);
 		free(cmd_whitespace);		
-	}
-	else{
+	} else {
 		return NULL;
 	}
 
-	return argv;
+	return pipeline_array;
 }
 
 int count_occ(const char* str, const char c){
 	int occurences = 0;
 	for(int i = 0; i < strlen(str); i++){
 		occurences += *(str + i) == c;
-	}
-	return occurences;
+	} return occurences;
 }
 
 char* trim_whitespace(const char* str){

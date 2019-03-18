@@ -35,15 +35,6 @@
 #define die(MSG,ERR) { if (MSG) { puts(MSG); } exit(ERR); }
 #define true_or_die(COND, MSG, ERR) { if(!(COND)) die(MSG, ERR); }
 
-static void free_args(char** args) {
-	if(!args) return;
-	int i = 0;
-	while(*(args+i)) {
-		free((char*)*(args+i));
-		i++;
-	} free(args);
-}
-
 // Initialises the shell and runs the main loop, getting input, parsing and executing commands.
 int main(int argc, char const *argv[])
 {	
@@ -78,13 +69,15 @@ int main(int argc, char const *argv[])
 		char* ps1 = generate_ps1();
 		char* line = read_line(ps1);
 
-		const char** args = (const char**) parse_command(line);
-		execute_command(args);
+		int pip_n = 0;
+		const PipelineNode** pipeline_array = (const PipelineNode**) parse_command(&pip_n, line);
+		if (pipeline_array) {
+			execute_pipelines(pip_n, pipeline_array);
+			if (pipeline_array)
+				pn_array_destroy(pip_n, (PipelineNode**) pipeline_array);
+			export_history_to_file(history_filepath);
+		}
 
-		free_args((char**)args);
-
-		export_history_to_file(history_filepath);
-		
 		if(line) free(line);
 		free(ps1);
 	}
