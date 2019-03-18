@@ -50,7 +50,7 @@ static int execute_pipeline_node(const PipelineNode* node, int in_fd) {
 		if (node->omode == OUT_MODE_OW)
 			out_file = fopen(node->out, "w");
 		else 
-			out_file = fopen(node->out, "wa");
+			out_file = fopen(node->out, "a");
 
 		if(!out_file) return NO_OUTFILE;
 		exec_out_fd = fileno(out_file);
