@@ -86,7 +86,6 @@ int rd_syntax_check(const char* const command) {
 static char* get_in_filename(const char* const subcmd) {
 	assert(subcmd);
 	
-	int started_writing = 0;
 	char* beg = strstr(subcmd, IN_TOKEN);
 	if (!beg) return NULL;
 	beg += 1;

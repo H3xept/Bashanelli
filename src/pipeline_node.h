@@ -18,6 +18,5 @@ PipelineNode* pn_new(char* cmd, char* in, char* out, OutMode omode);
 void pn_add(PipelineNode* head, PipelineNode* next);
 void pn_append(PipelineNode* head, PipelineNode* next);
 void pn_destroy(PipelineNode* head);
-
+void pn_array_destroy(int p_n, PipelineNode** array);
 #endif
-

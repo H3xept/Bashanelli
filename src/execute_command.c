@@ -62,7 +62,6 @@ static int execute_pipeline_node(const PipelineNode* node, int in_fd) {
 	}
 
 	char** argv = generate_argv(node->cmd);
-	printf("Command: %s\n",node->cmd);
 	execute_command((const char**)argv, exec_in_fd, exec_out_fd);
 
 	return ret_in_fd;
@@ -87,7 +86,6 @@ void execute_pipelines(int pipelines_n, const PipelineNode** pipelines) {
 
 void execute_command(const char** argv, int in_fd, int out_fd) {
 	if(!argv || !*argv) return;
-	printf("INFD: %d | OUTFD: %d\n",in_fd, out_fd);
 	if(is_builtin(argv[0])){
 		execute_builtin(argv[0], argv, in_fd, out_fd);
 	}
@@ -123,12 +121,11 @@ void execute_command(const char** argv, int in_fd, int out_fd) {
 
 void parse_and_execute_command(const char* command){
 	const char* parsed_line = parse_line((char*) command);
-	int p_n;
+	int p_n = 0;
 	const PipelineNode** pipelines = (const PipelineNode**) parse_command(&p_n, parsed_line);
 	execute_pipelines(p_n, pipelines);
-	
-	#pragma message("Free me:C")
-
+	if (pipelines)
+		pn_array_destroy(p_n, (PipelineNode**)pipelines);
 	free((char*)parsed_line);
 }
 

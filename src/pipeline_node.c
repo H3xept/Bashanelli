@@ -61,3 +61,10 @@ void pn_destroy(PipelineNode* head) {
 		curr = temp;
 	}	
 }
+
+void pn_array_destroy(int p_n, PipelineNode** array) {
+	assert(array);
+	for (int i = 0; i < p_n; ++i) {
+		pn_destroy(array[i]);
+	} free(array);
+}
