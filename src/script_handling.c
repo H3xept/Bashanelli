@@ -81,7 +81,7 @@ char **read_file(const char* filepath, unsigned int *lcount) {
 			*lcount *= 2;
 			lines = realloc(lines,*lcount*sizeof(char *));
 		}
-		lines[c] = malloc(strlen(tmp)*sizeof(char)+1);
+		lines[c] = calloc(strlen(tmp)+1,sizeof(char));
 		strcpy(lines[c],tmp);
 		c++;
 		char *oldtmp = tmp;
@@ -97,7 +97,7 @@ char *search_path(const char* filename) {
 
 	FILE *fp;
 	char *path, *ret, *tempath;
-	path = malloc((strlen(getenv(PATH_ENV))+1)*sizeof(char));
+	path = calloc((strlen(getenv(PATH_ENV))+1),sizeof(char));
 	strcpy(path,getenv(PATH_ENV));
 
 	if(!path)
@@ -105,7 +105,7 @@ char *search_path(const char* filename) {
 
 	tempath = strtok(path,":");
 	while (tempath != NULL) {
-		ret = malloc(strlen(tempath) + strlen(filename) + 2);
+		ret = calloc(strlen(tempath) + strlen(filename) + 2, sizeof(char));
 		strcpy(ret, tempath);
 		strcat(ret,"/");
 		strcat(ret, filename);

@@ -142,7 +142,7 @@ static char* get_command(const char* const subcmd) {
 	}
 
 	for (int i = strlen(ret)-1; i >= 0; i--) {
-		if (i[ret] == ' ') i[ret] = '\0';
+		if (i[ret] == ' ' || i[ret] == '\0') i[ret] = '\0';
 		else break;
 	}
 

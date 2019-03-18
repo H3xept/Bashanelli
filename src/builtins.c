@@ -98,13 +98,17 @@ int exec_builtin_id(int id, const char** argv){
 // Changes the working directory to the given arg
 // If not second arg is given then the working directory is set to $HOME
 static int builtin_cd(const char** argv){
-	if(*(argv + 2)){
+
+	size_t argvn = 0;
+	const char** cursor = argv;
+	while(*cursor) { argvn++;  cursor++;}
+
+	if(argvn > 2){
 		printf("bashanelli: cd: too many arguments\n");
 		return 1;
 	}
-	if(!*(argv + 1)){
-		chdir(getenv(HOME_ENV));
-	}
+
+	if(!*(argv + 1)) chdir(getenv(HOME_ENV));
 	else if(chdir(*(argv + 1))) {
 		warn("cd: %s", *(argv + 1));
 		return 1;

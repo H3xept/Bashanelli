@@ -173,6 +173,7 @@ static char *get_arg(const char *arg, const char **endptr) {
 		i++;
 	}
 	char *ret = (!c) ? NULL : calloc(c + 1,sizeof(char));
+
 	if(!ret){
 		*endptr = NULL;
 		return ret;

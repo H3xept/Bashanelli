@@ -85,6 +85,7 @@ void execute_pipelines(int pipelines_n, const PipelineNode** pipelines) {
 }
 
 void execute_command(const char** argv, int in_fd, int out_fd) {
+
 	if(!argv || !*argv) return;
 	if(is_builtin(argv[0])){
 		execute_builtin(argv[0], argv, in_fd, out_fd);
