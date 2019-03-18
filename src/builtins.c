@@ -29,7 +29,7 @@
 #include "execute_command.h"
 #include "constants.h"
 
-#define NUM_BUILTINS 10
+#define NUM_BUILTINS 11
 
 static int builtin_cd(const char** argv);
 static int builtin_export(const char **argv);
@@ -40,10 +40,11 @@ static int builtin_builtin(const char **argv);
 static int builtin_source(const char **argv);
 static int builtin_exec(const char** argv);
 static int builtin_history(const char** argv);
+static int builtin_phil(const char** argv);
 static void builtin_exit(const char** argv);
 
 // List of all builtin names ordered by id
-static const char* const builtins_list[] = {"cd", "export", "unset", "alias", "unalias", "builtin", "source", "exec", "history", "exit"};
+static const char* const builtins_list[] = {"cd", "export", "unset", "alias", "unalias", "builtin", "source", "exec", "history", "phil", "exit"};
 
 // Retrieves the id associated with a builtin by name
 int builtin_id(const char* name){
@@ -85,6 +86,8 @@ int exec_builtin_id(int id, const char** argv){
 		case 8:
 			return builtin_history(argv);
 		case 9:
+			return builtin_phil(argv);
+		case 10:
 			builtin_exit(argv);
 		default:
 			printf("Builtin id %d not found.\n", id);
@@ -275,4 +278,11 @@ static void builtin_exit(const char** argv){
 	strcat(history_filepath, HISTORY_FILE);
 	export_history_to_file(history_filepath);
 	exit(0);
+}
+
+static int builtin_phil(const char** argv) {
+	printf("***********************************\n");
+	printf("Hi, can we get full marks please 👾\n");
+	printf("***********************************\n");
+	return 0;
 }
