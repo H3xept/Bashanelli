@@ -112,22 +112,26 @@ void test_trim_only_whitespace() {
 
 void test_parse_nulls1() {
 	char *str1 = 0;
-	parse_command(str1);
+	int p;
+	parse_command(&p, str1);
 }
 
 void test_parse_nulls2() {
 	char str2[] = "";
-	parse_command(str2);
+	int p;
+	parse_command(&p, str2);
 }
 
 void test_parse_nulls3() {
 	char str3[] = "#";
-	parse_command(str3);
+	int p;
+	parse_command(&p, str3);
 }
 
 void test_generate_argv_null(){
 	char *str3 = NULL;
-	generate_argv(str3);
+	int p;
+	parse_command(&p, str3);
 }
 
 void teardown(){

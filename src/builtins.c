@@ -223,11 +223,11 @@ static int builtin_source(const char** argv){
 	}
 	const char* full_path = file_path(*(argv + 1));
 	if(full_path){
-		execute_shell_script(full_path, argv + 1);
+		execute_shell_script(full_path, argv + 1, NO_FD, NO_FD);
 		free((char*)full_path);
 		return 0;
 	}
-	execute_shell_script(*(argv + 1), argv + 1);
+	execute_shell_script(*(argv + 1), argv + 1, NO_FD, NO_FD);
 	return 0;
 }
 
@@ -238,11 +238,11 @@ static int builtin_exec(const char** argv){
 	}
 	const char* full_path = file_path(*(argv + 1));
 	if(full_path){
-		execute_bin(full_path, argv + 1);
+		execute_bin(full_path, argv + 1, NO_FD, NO_FD);
 		free((char*)full_path);
 		return 0;
 	}
-	execute_bin(*(argv + 1), argv + 1);
+	execute_bin(*(argv + 1), argv + 1, NO_FD, NO_FD);
 	return 0;
 }
 

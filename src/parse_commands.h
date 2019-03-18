@@ -1,8 +1,10 @@
 #ifndef PARSE_COMMANDS
 #define PARSE_COMMANDS
 
+#include "pipeline_node.h"
+
 //gets single command, trims outer whitespace, ignores line after #, returns alloced argv.
-char** parse_command(const char *command);
+PipelineNode** parse_command(int* pipelines_n, const char *command);
 
 //input full line of commands and pipeline/redirection symbols
 //UNIMPLEMENTED

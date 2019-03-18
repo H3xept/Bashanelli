@@ -115,6 +115,11 @@ void testGetCommand() {
 	assert_eq_str("commando", rd_test_get_command(test));
 }
 
+void testGetCommand2() {
+	char* test = "               commando --arg -arrrg >> filerino";
+	assert_eq_str("commando --arg -arrrg", rd_test_get_command(test));
+}
+
 void testCreatePipeline() {
 	char* test = "ls | head -3 > ls.txt";
 	PipelineNode* head = rd_test_create_pipeline(test);
@@ -124,7 +129,7 @@ void testCreatePipeline() {
 	assert_null(head->out);
 	assert_not_null(head->next);
 	PipelineNode* next = head->next;
-	assert_eq_str("head", next->cmd);
+	assert_eq_str("head -3", next->cmd);
 	assert_null(next->in);
 	assert_eq_str("ls.txt", next->out);
 	assert_eq_int(OUT_MODE_OW, next->omode);
@@ -145,7 +150,7 @@ void testCreatePipelines() {
 	assert_eq_int(OUT_MODE_AP, head->omode);
 	assert_not_null(head->next);
 	PipelineNode* next = head->next;
-	assert_eq_str("echo", next->cmd);
+	assert_eq_str("echo lolz.txt", next->cmd);
 	assert_null(next->in);
 	assert_null(next->out);
 	assert_not_null(next->next);

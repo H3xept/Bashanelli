@@ -29,35 +29,91 @@
 
 static int recent_exit_code = 0;
 
-void execute_command(const char** argv){
-	if(!argv || !*argv){
-		return;
+static int execute_pipeline_node(const PipelineNode* node, int in_fd) {
+	
+	int exec_in_fd = in_fd;
+	int exec_out_fd = NO_FD;
+	int ret_in_fd = NO_FD;
+
+	FILE* in_file = NULL;
+	FILE* out_file = NULL;
+
+	if(in_fd == NO_FD) {
+		if(node->in) {
+			in_file = fopen(node->in, "r");
+			if(!in_file) return NO_INFILE;
+			exec_in_fd = fileno(in_file);
+		}
 	}
+
+	if(node->out){
+		if (node->omode == OUT_MODE_OW)
+			out_file = fopen(node->out, "w");
+		else 
+			out_file = fopen(node->out, "wa");
+
+		if(!out_file) return NO_OUTFILE;
+		exec_out_fd = fileno(out_file);
+	} else if (node->next) {
+		int fd[2];
+		pipe(fd);
+		exec_out_fd = fd[1];
+		ret_in_fd = fd[0];
+	}
+
+	char** argv = generate_argv(node->cmd);
+	printf("Command: %s\n",node->cmd);
+	execute_command((const char**)argv, exec_in_fd, exec_out_fd);
+
+	return ret_in_fd;
+
+}
+
+static void execute_pipeline(const PipelineNode* pipeline) {
+	const PipelineNode* current = pipeline;
+	int fd = NO_FD;
+ 	do {
+ 		fd = execute_pipeline_node(current, fd);
+ 		current = current->next;
+ 	}
+ 	while(current);
+}
+
+void execute_pipelines(int pipelines_n, const PipelineNode** pipelines) {
+	for (int i = 0; i < pipelines_n; ++i) {
+		execute_pipeline(pipelines[i]);
+	}
+}
+
+void execute_command(const char** argv, int in_fd, int out_fd) {
+	if(!argv || !*argv) return;
+
 	if(is_builtin(argv[0])){
-		execute_builtin(argv[0], argv);
+		execute_builtin(argv[0], argv, in_fd, out_fd);
 	}
 	else{
 		const char* full_filepath = file_path(argv[0]);
 		if(full_filepath){
 			if(is_executable(full_filepath)){
-				execute_bin(full_filepath, argv);
+				printf("INFD: %d | OUTFD: %d\n",in_fd, out_fd);
+				execute_bin(full_filepath, argv, in_fd, out_fd);
 			}
 			else{
-				execute_shell_script(full_filepath, argv);
+				execute_shell_script(full_filepath, argv, in_fd, out_fd);
 			}
 			free((char*)full_filepath);
 			return;
 		}
 		if(file_exists(argv[0])){
 			if(is_executable(argv[0])){
-				execute_bin(argv[0], argv);
+				execute_bin(argv[0], argv, in_fd, out_fd);
 			}
 			else{
 				if(is_dir(argv[0])){
 					printf("bashanelli: %s: Is a directory\n", argv[0]);
 					return;
 				}
-				execute_shell_script(argv[0], argv);
+				execute_shell_script(argv[0], argv, in_fd, out_fd);
 			}
 		}
 		else{
@@ -68,24 +124,41 @@ void execute_command(const char** argv){
 
 void parse_and_execute_command(const char* command){
 	const char* parsed_line = parse_line((char*) command);
-	char** argv = parse_command(parsed_line);
-	execute_command((const char**)argv);
-	if(argv){
-		int i = 0;
-		while(*(argv+i)) {
-			free(*(argv+i));
-			i++;
-		}
-		free(argv);
-	}
+	int p_n;
+	const PipelineNode** pipelines = (const PipelineNode**) parse_command(&p_n, parsed_line);
+	execute_pipelines(p_n, pipelines);
+	
+	#pragma message("Free me:C")
+
 	free((char*)parsed_line);
 }
 
-void execute_builtin(const char* command, const char** argv){
-	recent_exit_code = exec_builtin_str(command, argv);
+void execute_builtin(const char* command, const char** argv, int in_fd, int out_fd) {
+
+	pid_t pid = vfork();
+
+	if(!pid){
+
+		int s_stdout = dup(STDOUT_FILENO);
+		int s_stdin = dup(STDIN_FILENO);
+
+		if (in_fd != NO_FD) dup2(in_fd, 0);
+		if (out_fd != NO_FD) dup2(out_fd, 1);
+
+		recent_exit_code = exec_builtin_str(command, argv);
+
+		dup2(s_stdin, 0);
+		dup2(s_stdout, 1);
+
+		exit(0);
+	}
+	else{
+		waitpid(pid, NULL, 0);
+	}
+
 }
 
-void execute_shell_script(const char* filename, const char** argv){
+void execute_shell_script(const char* filename, const char** argv, int in_fd, int out_fd) {
 	if(!filename){
 		printf("No filename given");
 		recent_exit_code = -1;
@@ -107,9 +180,20 @@ void execute_shell_script(const char* filename, const char** argv){
 	}
 	pid_t pid = vfork();
 	if(!pid){
+		
+		int s_stdout = dup(STDOUT_FILENO);
+		int s_stdin = dup(STDIN_FILENO);
+
+		if (in_fd != NO_FD) dup2(in_fd, 0);
+		if (out_fd != NO_FD) dup2(out_fd, 1);
+
 		push_argv_frame(argv, i);
 		handle_script(filename);
 		pop_argv_frame();
+
+		dup2(s_stdin, 0);
+		dup2(s_stdout, 1);
+
 		exit(0);
 	}
 	else{
@@ -118,14 +202,25 @@ void execute_shell_script(const char* filename, const char** argv){
 
 }
 
-void execute_bin(const char* filename, const char** argv) {
-	pid_t pid = fork();
+void execute_bin(const char* filename, const char** argv, int in_fd, int out_fd)  {
+	pid_t pid = vfork();
 	if(!pid){
+
+		int s_stdout = dup(STDOUT_FILENO);
+		int s_stdin = dup(STDIN_FILENO);
+
+		if (in_fd != NO_FD) dup2(in_fd, 0);
+		if (out_fd != NO_FD) dup2(out_fd, 1);
+
 		recent_exit_code = execvp(filename, ((char* const *)argv));
 		if(recent_exit_code == -1){
 			printf("%s: program not found\n", filename);
 			fflush(stdout);
 		};
+
+		dup2(s_stdin, 0);
+		dup2(s_stdout, 1);
+
 		exit(0);
 	}
 	else{

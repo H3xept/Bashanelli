@@ -22,6 +22,7 @@ void testGetInFilename();
 void testGetOutFilename();
 void testGetOutFilename2();
 void testGetCommand();
+void testGetCommand2();
 void testCreatePipeline();
 void testCreatePipelines();
 void teardown();

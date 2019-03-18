@@ -83,13 +83,17 @@ int main(int argc, char const *argv[])
 		char* ps1 = generate_ps1();
 		char* line = read_line(ps1);
 
-		const char** args = (const char**) parse_command(line);
-		execute_command(args);
+		int pip_n = 0;
+		const PipelineNode** pipeline_array = (const PipelineNode**) parse_command(&pip_n, line);
+		if (pipeline_array) {
+			execute_pipelines(pip_n, pipeline_array);
 
-		free_args((char**)args);
+			// pn_array_destroy(pipeline_array);
 
-		export_history_to_file(history_filepath);
+			export_history_to_file(history_filepath);
 		
+		}
+
 		if(line) free(line);
 		free(ps1);
 	}

@@ -138,7 +138,12 @@ static char* get_command(const char* const subcmd) {
 
 	while(*cursor && *cursor == ' ') cursor++;
 	for (int i = 0; i < strlen(cursor); i++) {
-		if (*(cursor+i) != ' ') i[ret] = *(cursor+i);
+		if (!in(*(cursor+i), redir_symbols)) i[ret] = *(cursor+i);
+		else break;
+	}
+
+	for (int i = strlen(ret)-1; i >= 0; i--) {
+		if (i[ret] == ' ') i[ret] = '\0';
 		else break;
 	}
 
@@ -195,8 +200,19 @@ static int pipelines_n(const char* const command) {
 PipelineNode** rd_parse_command(int* nodes_n, const char* const command) {
 	if (!command) return NULL;
 	
+	// Hack to make aliases work with all this last minute crap
+	// 🤖👾
+	if (!strncmp(command, "alias", 5)) {
+		PipelineNode** fakearray = calloc(1, sizeof(PipelineNode*));
+		0[fakearray] = pn_new((char*)command, NULL, NULL, 0);
+		*nodes_n = 1;
+		return fakearray;
+	}
+
 	PipelineNode** pipelines_array = NULL;
 	int p_n = pipelines_n(command);
+	*nodes_n = p_n;
+
 	pipelines_array = calloc(p_n, sizeof(PipelineNode*));
 
 	int j = 0;
