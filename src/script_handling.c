@@ -13,7 +13,6 @@
 #define DEFAULT_LINES 50
 
 int handle_script(const char *filename) {
-
 	unsigned int lines = 0;
 	char **scrlines = 0;
 	char *inpath = 0;

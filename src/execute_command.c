@@ -30,7 +30,7 @@
 static int recent_exit_code = 0;
 
 static int execute_pipeline_node(const PipelineNode* node, int in_fd) {
-	
+
 	int exec_in_fd = in_fd;
 	int exec_out_fd = NO_FD;
 	int ret_in_fd = NO_FD;
@@ -131,33 +131,26 @@ void parse_and_execute_command(const char* command){
 
 void execute_builtin(const char* command, const char** argv, int in_fd, int out_fd) {
 
-	pid_t pid = vfork();
+	int s_stdin = -1;
+	int s_stdout = -1;
 
-	if(!pid){
-
+	if (in_fd != NO_FD){
+		s_stdin = dup(STDIN_FILENO);
+		dup2(in_fd, STDIN_FILENO);
 		
-		int s_stdin = -1;
-		int s_stdout = -1;
+	} 
+	if (out_fd != NO_FD){
+		s_stdout = dup(STDOUT_FILENO);
+		dup2(out_fd, 1);	
+	} 
 
-		if (in_fd != NO_FD){
-			s_stdin = dup(STDIN_FILENO);
-			dup2(in_fd, STDIN_FILENO);
-			
-		} 
-		if (out_fd != NO_FD){
-			s_stdout = dup(STDOUT_FILENO);
-			dup2(out_fd, 1);
-			
-		} 
+	recent_exit_code = exec_builtin_str(command, argv);
 
-		recent_exit_code = exec_builtin_str(command, argv);
-
-		exit(0);
+	if(s_stdin != NO_FD){
+		dup2(STDIN_FILENO, s_stdin);
 	}
-	else{
-		if(in_fd != NO_FD) close(in_fd);
-		if(out_fd != NO_FD) close(out_fd);
-		waitpid(pid, NULL, 0);
+	if(s_stdout != NO_FD){
+		dup2(STDOUT_FILENO, s_stdout);
 	}
 
 }
@@ -184,7 +177,6 @@ void execute_shell_script(const char* filename, const char** argv, int in_fd, in
 	}
 	pid_t pid = vfork();
 	if(!pid){
-		
 		int s_stdin = -1;
 		int s_stdout = -1;
 
@@ -204,10 +196,10 @@ void execute_shell_script(const char* filename, const char** argv, int in_fd, in
 		pop_argv_frame();
 
 		if(s_stdin != NO_FD){
-			dup2(s_stdin, STDIN_FILENO);
+			dup2(STDIN_FILENO, s_stdin);
 		}
 		if(s_stdout != NO_FD){
-			dup2(s_stdout, STDOUT_FILENO);
+			dup2(STDOUT_FILENO, s_stdout);
 		}
 
 		exit(0);
