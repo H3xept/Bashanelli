@@ -87,7 +87,7 @@ void execute_pipelines(int pipelines_n, const PipelineNode** pipelines) {
 
 void execute_command(const char** argv, int in_fd, int out_fd) {
 	if(!argv || !*argv) return;
-
+	printf("INFD: %d | OUTFD: %d\n",in_fd, out_fd);
 	if(is_builtin(argv[0])){
 		execute_builtin(argv[0], argv, in_fd, out_fd);
 	}
@@ -95,7 +95,6 @@ void execute_command(const char** argv, int in_fd, int out_fd) {
 		const char* full_filepath = file_path(argv[0]);
 		if(full_filepath){
 			if(is_executable(full_filepath)){
-				printf("INFD: %d | OUTFD: %d\n",in_fd, out_fd);
 				execute_bin(full_filepath, argv, in_fd, out_fd);
 			}
 			else{
@@ -139,20 +138,37 @@ void execute_builtin(const char* command, const char** argv, int in_fd, int out_
 
 	if(!pid){
 
-		int s_stdout = dup(STDOUT_FILENO);
-		int s_stdin = dup(STDIN_FILENO);
+		
+		int s_stdin = -1;
+		int s_stdout = -1;
 
-		if (in_fd != NO_FD) dup2(in_fd, 0);
-		if (out_fd != NO_FD) dup2(out_fd, 1);
+		if (in_fd != NO_FD){
+			s_stdin = dup(STDIN_FILENO);
+			dup2(in_fd, STDIN_FILENO);
+			
+		} 
+		if (out_fd != NO_FD){
+			s_stdout = dup(STDOUT_FILENO);
+			dup2(out_fd, 1);
+			
+		} 
 
 		recent_exit_code = exec_builtin_str(command, argv);
 
-		dup2(s_stdin, 0);
-		dup2(s_stdout, 1);
+		if(s_stdin != NO_FD){
+			dup2(s_stdin, STDIN_FILENO);
+		}
+		if(s_stdout != NO_FD){
+			dup2(s_stdout, STDOUT_FILENO);
+		}
+		
+		
 
 		exit(0);
 	}
 	else{
+		if(in_fd != NO_FD) close(in_fd);
+		if(out_fd != NO_FD) close(out_fd);
 		waitpid(pid, NULL, 0);
 	}
 
@@ -181,19 +197,32 @@ void execute_shell_script(const char* filename, const char** argv, int in_fd, in
 	pid_t pid = vfork();
 	if(!pid){
 		
-		int s_stdout = dup(STDOUT_FILENO);
-		int s_stdin = dup(STDIN_FILENO);
+		int s_stdin = -1;
+		int s_stdout = -1;
 
-		if (in_fd != NO_FD) dup2(in_fd, 0);
-		if (out_fd != NO_FD) dup2(out_fd, 1);
+		if (in_fd != NO_FD){
+			s_stdin = dup(STDIN_FILENO);
+			dup2(in_fd, STDIN_FILENO);
+			
+		} 
+		if (out_fd != NO_FD){
+			s_stdout = dup(STDOUT_FILENO);
+			dup2(out_fd, 1);
+			
+		} 
 
 		push_argv_frame(argv, i);
 		handle_script(filename);
 		pop_argv_frame();
 
-		dup2(s_stdin, 0);
-		dup2(s_stdout, 1);
-
+		if(s_stdin != NO_FD){
+			dup2(s_stdin, STDIN_FILENO);
+		}
+		if(s_stdout != NO_FD){
+			dup2(s_stdout, STDOUT_FILENO);
+		}
+		if(in_fd != NO_FD) close(in_fd);
+		if(out_fd != NO_FD) close(out_fd);
 		exit(0);
 	}
 	else{
@@ -206,11 +235,19 @@ void execute_bin(const char* filename, const char** argv, int in_fd, int out_fd)
 	pid_t pid = vfork();
 	if(!pid){
 
-		int s_stdout = dup(STDOUT_FILENO);
-		int s_stdin = dup(STDIN_FILENO);
+		int s_stdin = -1;
+		int s_stdout = -1;
 
-		if (in_fd != NO_FD) dup2(in_fd, 0);
-		if (out_fd != NO_FD) dup2(out_fd, 1);
+		if (in_fd != NO_FD){
+			s_stdin = dup(STDIN_FILENO);
+			dup2(in_fd, STDIN_FILENO);
+			
+		} 
+		if (out_fd != NO_FD){
+			s_stdout = dup(STDOUT_FILENO);
+			dup2(out_fd, 1);
+			
+		} 
 
 		recent_exit_code = execvp(filename, ((char* const *)argv));
 		if(recent_exit_code == -1){
@@ -218,9 +255,14 @@ void execute_bin(const char* filename, const char** argv, int in_fd, int out_fd)
 			fflush(stdout);
 		};
 
-		dup2(s_stdin, 0);
-		dup2(s_stdout, 1);
-
+		if(s_stdin != NO_FD){
+			dup2(s_stdin, STDIN_FILENO);
+		}
+		if(s_stdout != NO_FD){
+			dup2(s_stdout, STDOUT_FILENO);
+		}
+		if(in_fd != NO_FD) close(in_fd);
+		if(out_fd != NO_FD) close(out_fd);
 		exit(0);
 	}
 	else{
