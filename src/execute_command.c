@@ -155,15 +155,6 @@ void execute_builtin(const char* command, const char** argv, int in_fd, int out_
 
 		recent_exit_code = exec_builtin_str(command, argv);
 
-		if(s_stdin != NO_FD){
-			dup2(s_stdin, STDIN_FILENO);
-		}
-		if(s_stdout != NO_FD){
-			dup2(s_stdout, STDOUT_FILENO);
-		}
-		
-		
-
 		exit(0);
 	}
 	else{
@@ -221,11 +212,12 @@ void execute_shell_script(const char* filename, const char** argv, int in_fd, in
 		if(s_stdout != NO_FD){
 			dup2(s_stdout, STDOUT_FILENO);
 		}
-		if(in_fd != NO_FD) close(in_fd);
-		if(out_fd != NO_FD) close(out_fd);
+
 		exit(0);
 	}
 	else{
+		if(in_fd != NO_FD) close(in_fd);
+		if(out_fd != NO_FD) close(out_fd);
 		waitpid(pid, NULL, 0);
 	}
 
@@ -250,22 +242,14 @@ void execute_bin(const char* filename, const char** argv, int in_fd, int out_fd)
 		} 
 
 		recent_exit_code = execvp(filename, ((char* const *)argv));
-		if(recent_exit_code == -1){
-			printf("%s: program not found\n", filename);
-			fflush(stdout);
-		};
+		printf("%s: program not found\n", filename);
+		fflush(stdout);
 
-		if(s_stdin != NO_FD){
-			dup2(s_stdin, STDIN_FILENO);
-		}
-		if(s_stdout != NO_FD){
-			dup2(s_stdout, STDOUT_FILENO);
-		}
-		if(in_fd != NO_FD) close(in_fd);
-		if(out_fd != NO_FD) close(out_fd);
 		exit(0);
 	}
 	else{
+		if(in_fd != NO_FD) close(in_fd);
+		if(out_fd != NO_FD) close(out_fd);
 		waitpid(pid, NULL, 0);
 	}
 }
