@@ -146,8 +146,10 @@ static char* get_command(const char* const subcmd) {
 		else break;
 	}
 
-	ret = realloc(ret, (strlen(ret)+1)*sizeof(char));
-	return ret;
+	char* r = calloc(strlen(ret)+1, sizeof(char));
+	strncpy(r, ret, strlen(ret));
+	if (ret) free(ret);
+	return r;
 }
 
 static void create_node_and_append(PipelineNode** head, const char* const command) {

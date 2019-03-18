@@ -122,6 +122,7 @@ void execute_command(const char** argv, int in_fd, int out_fd) {
 
 void parse_and_execute_command(const char* command){
 	const char* parsed_line = parse_line((char*) command);
+
 	int p_n = 0;
 	const PipelineNode** pipelines = (const PipelineNode**) parse_command(&p_n, parsed_line);
 	execute_pipelines(p_n, pipelines);

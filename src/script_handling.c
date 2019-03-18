@@ -84,9 +84,8 @@ char **read_file(const char* filepath, unsigned int *lcount) {
 		lines[c] = calloc(strlen(tmp)+1,sizeof(char));
 		strcpy(lines[c],tmp);
 		c++;
-		char *oldtmp = tmp;
+		free(tmp); 
 		tmp = 0;
-		free(oldtmp);
 	}
 	*lcount = c;
 	fclose(sfp);
